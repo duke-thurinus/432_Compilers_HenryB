@@ -33,7 +33,9 @@ class Graph_vertex{
         // next vertex is null but it is not the last
       }
     } else {
-      if (word.length() != 1){
+      if (word.length() == 1){
+        lower_vertex.token = word;
+      } else {
         insert(lower_vertex, word, 1);
         // next vertex exists and there is more after
       }
@@ -52,7 +54,9 @@ class Graph_vertex{
         // next vertex is null but it is not the last
       }
     } else {
-      if (word.length() >= i+1){
+      if (word.length() <= i+1){
+        lower_vertex.token = word;
+      } else {
         insert(lower_vertex, word, i+1);
         // next vertex exists and there is more after
       }
