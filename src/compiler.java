@@ -11,6 +11,63 @@ public class compiler {
 class lex{
   static void lexer(){
     Graph_vertex head = new Graph_vertex("");
+
+    // build graph
+    Graph_vertex.insert(head,"a");
+    Graph_vertex.insert(head,"b");
+    Graph_vertex.insert(head,"c");
+    Graph_vertex.insert(head,"d");
+    Graph_vertex.insert(head,"e");
+    Graph_vertex.insert(head,"f");
+    Graph_vertex.insert(head,"g");
+    Graph_vertex.insert(head,"h");
+    Graph_vertex.insert(head,"i");
+    Graph_vertex.insert(head,"j");
+    Graph_vertex.insert(head,"k");
+    Graph_vertex.insert(head,"l");
+    Graph_vertex.insert(head,"m");
+    Graph_vertex.insert(head,"n");
+    Graph_vertex.insert(head,"o");
+    Graph_vertex.insert(head,"p");
+    Graph_vertex.insert(head,"q");
+    Graph_vertex.insert(head,"r");
+    Graph_vertex.insert(head,"s");
+    Graph_vertex.insert(head,"t");
+    Graph_vertex.insert(head,"u");
+    Graph_vertex.insert(head,"v");
+    Graph_vertex.insert(head,"w");
+    Graph_vertex.insert(head,"x");
+    Graph_vertex.insert(head,"y");
+    Graph_vertex.insert(head,"z");
+    Graph_vertex.insert(head,"0");
+    Graph_vertex.insert(head,"1");
+    Graph_vertex.insert(head,"2");
+    Graph_vertex.insert(head,"3");
+    Graph_vertex.insert(head,"4");
+    Graph_vertex.insert(head,"5");
+    Graph_vertex.insert(head,"6");
+    Graph_vertex.insert(head,"7");
+    Graph_vertex.insert(head,"8");
+    Graph_vertex.insert(head,"9");
+    Graph_vertex.insert(head,"+");
+    Graph_vertex.insert(head,"==");
+    Graph_vertex.insert(head,"!=");
+    Graph_vertex.insert(head,"{");
+    Graph_vertex.insert(head,"}");
+    Graph_vertex.insert(head,"(");
+    Graph_vertex.insert(head,")");
+    Graph_vertex.insert(head,"\"");
+    Graph_vertex.insert(head,"/*");
+    Graph_vertex.insert(head," ");
+    Graph_vertex.insert(head,"print");
+    Graph_vertex.insert(head,"while");
+    Graph_vertex.insert(head,"if");
+    Graph_vertex.insert(head,"int");
+    Graph_vertex.insert(head,"string");
+    Graph_vertex.insert(head,"boolean");
+    Graph_vertex.insert(head,"false");
+    Graph_vertex.insert(head,"true");
+    System.out.println();
   }
 }
 class Graph_vertex{
