@@ -13,60 +13,59 @@ class lex{
     Graph_vertex head = new Graph_vertex("");
 
     // build graph
-    Graph_vertex.insert(head,"a");
-    Graph_vertex.insert(head,"b");
-    Graph_vertex.insert(head,"c");
-    Graph_vertex.insert(head,"d");
-    Graph_vertex.insert(head,"e");
-    Graph_vertex.insert(head,"f");
-    Graph_vertex.insert(head,"g");
-    Graph_vertex.insert(head,"h");
-    Graph_vertex.insert(head,"i");
-    Graph_vertex.insert(head,"j");
-    Graph_vertex.insert(head,"k");
-    Graph_vertex.insert(head,"l");
-    Graph_vertex.insert(head,"m");
-    Graph_vertex.insert(head,"n");
-    Graph_vertex.insert(head,"o");
-    Graph_vertex.insert(head,"p");
-    Graph_vertex.insert(head,"q");
-    Graph_vertex.insert(head,"r");
-    Graph_vertex.insert(head,"s");
-    Graph_vertex.insert(head,"t");
-    Graph_vertex.insert(head,"u");
-    Graph_vertex.insert(head,"v");
-    Graph_vertex.insert(head,"w");
-    Graph_vertex.insert(head,"x");
-    Graph_vertex.insert(head,"y");
-    Graph_vertex.insert(head,"z");
-    Graph_vertex.insert(head,"0");
-    Graph_vertex.insert(head,"1");
-    Graph_vertex.insert(head,"2");
-    Graph_vertex.insert(head,"3");
-    Graph_vertex.insert(head,"4");
-    Graph_vertex.insert(head,"5");
-    Graph_vertex.insert(head,"6");
-    Graph_vertex.insert(head,"7");
-    Graph_vertex.insert(head,"8");
-    Graph_vertex.insert(head,"9");
-    Graph_vertex.insert(head,"+");
-    Graph_vertex.insert(head,"==");
-    Graph_vertex.insert(head,"!=");
-    Graph_vertex.insert(head,"{");
-    Graph_vertex.insert(head,"}");
-    Graph_vertex.insert(head,"(");
-    Graph_vertex.insert(head,")");
-    Graph_vertex.insert(head,"\"");
-    Graph_vertex.insert(head,"/*");
-    Graph_vertex.insert(head," ");
-    Graph_vertex.insert(head,"print");
-    Graph_vertex.insert(head,"while");
-    Graph_vertex.insert(head,"if");
-    Graph_vertex.insert(head,"int");
-    Graph_vertex.insert(head,"string");
-    Graph_vertex.insert(head,"boolean");
-    Graph_vertex.insert(head,"false");
-    Graph_vertex.insert(head,"true");
+    Graph_vertex.insert(head,"a", "ID [a]");
+    Graph_vertex.insert(head,"b", "ID [b]");
+    Graph_vertex.insert(head,"c", "ID [c]");
+    Graph_vertex.insert(head,"d", "ID [d]");
+    Graph_vertex.insert(head,"e", "ID [e]");
+    Graph_vertex.insert(head,"f", "ID [f]");
+    Graph_vertex.insert(head,"g", "ID [g]");
+    Graph_vertex.insert(head,"h", "ID [h]");
+    Graph_vertex.insert(head,"i", "ID [i]");
+    Graph_vertex.insert(head,"j", "ID [j]");
+    Graph_vertex.insert(head,"k", "ID [k]");
+    Graph_vertex.insert(head,"l", "ID [l]");
+    Graph_vertex.insert(head,"m", "ID [m]");
+    Graph_vertex.insert(head,"n", "ID [n]");
+    Graph_vertex.insert(head,"o", "ID [o]");
+    Graph_vertex.insert(head,"p", "ID [p]");
+    Graph_vertex.insert(head,"q", "ID [q]");
+    Graph_vertex.insert(head,"r", "ID [r]");
+    Graph_vertex.insert(head,"s", "ID [s]");
+    Graph_vertex.insert(head,"t", "ID [t]");
+    Graph_vertex.insert(head,"u", "ID [u]");
+    Graph_vertex.insert(head,"v", "ID [v]");
+    Graph_vertex.insert(head,"w", "ID [w]");
+    Graph_vertex.insert(head,"x", "ID [x]");
+    Graph_vertex.insert(head,"y", "ID [y]");
+    Graph_vertex.insert(head,"z", "ID [z]");
+    Graph_vertex.insert(head,"0", "DIGIT [0]");
+    Graph_vertex.insert(head,"1", "DIGIT [1]");
+    Graph_vertex.insert(head,"2", "DIGIT [2]");
+    Graph_vertex.insert(head,"3", "DIGIT [3]");
+    Graph_vertex.insert(head,"4", "DIGIT [4]");
+    Graph_vertex.insert(head,"5", "DIGIT [5]");
+    Graph_vertex.insert(head,"6", "DIGIT [6]");
+    Graph_vertex.insert(head,"7", "DIGIT [7]");
+    Graph_vertex.insert(head,"8", "DIGIT [8]");
+    Graph_vertex.insert(head,"9", "DIGIT [9]");
+    Graph_vertex.insert(head,"+", "ADDITION");
+    Graph_vertex.insert(head,"==", "EQUALITY_OP");
+    Graph_vertex.insert(head,"!=", "INEQUALITY_OP");
+    Graph_vertex.insert(head,"{", "OPEN_BRACE");
+    Graph_vertex.insert(head,"}", "CLOSE_BRACE");
+    Graph_vertex.insert(head,"(", "OPEN_PARENTHESISE");
+    Graph_vertex.insert(head,")", "CLOSED_PARENTHESISE");
+    Graph_vertex.insert(head,"\"", "QUOTE_MARK");
+    Graph_vertex.insert(head,"/*", "COMMENT_START");
+    Graph_vertex.insert(head,"print", "PRINT");
+    Graph_vertex.insert(head,"while", "WHILE");
+    Graph_vertex.insert(head,"if", "IF");
+    Graph_vertex.insert(head,"int", "VARIABLE_TYPE [INT]");
+    Graph_vertex.insert(head,"string", "VARIABLE_TYPE [STRING]");
+    Graph_vertex.insert(head,"boolean", "VARIABLE_TYPE [BOOL]");
+    Graph_vertex.insert(head,"false", "BOOL_VAL [FALSE]");
+    Graph_vertex.insert(head,"true", "BOOL_VAL [TRUE]");
     System.out.println();
   }
 }
@@ -78,43 +77,43 @@ class Graph_vertex{
     this.token = token;
     vertices = new HashMap<>();
   }
-  static void insert(Graph_vertex vertex, String word){
+  static void insert(Graph_vertex vertex, String word, String token_description){
     Graph_vertex lower_vertex = vertex.vertices.get(word.charAt(0));
     if (lower_vertex == null){
       if (word.length() == 1) {
-        vertex.vertices.put(word.charAt(0), new Graph_vertex(word));
+        vertex.vertices.put(word.charAt(0), new Graph_vertex(token_description));
         // this is the end of insert and but last vertex is null
       } else {
         vertex.vertices.put(word.charAt(0), new Graph_vertex(""));
-        insert(vertex.vertices.get(word.charAt(0)), word, 1);
+        insert(vertex.vertices.get(word.charAt(0)), word, token_description, 1);
         // next vertex is null but it is not the last
       }
     } else {
       if (word.length() == 1){
-        lower_vertex.token = word;
+        lower_vertex.token = token_description;
       } else {
-        insert(lower_vertex, word, 1);
+        insert(lower_vertex, word, token_description, 1);
         // next vertex exists and there is more after
       }
     }
   }
 
-  static void insert(Graph_vertex vertex, String word, int i){
+  static void insert(Graph_vertex vertex, String word, String token_description, int i){
     Graph_vertex lower_vertex = vertex.vertices.get(word.charAt(i));
     if (lower_vertex == null){
       if (word.length() <= i+1) {
-        vertex.vertices.put(word.charAt(i), new Graph_vertex(word));
+        vertex.vertices.put(word.charAt(i), new Graph_vertex(token_description));
         // this is the end of insert and but last vertex is null
       } else {
         vertex.vertices.put(word.charAt(i), new Graph_vertex(""));
-        insert(vertex.vertices.get(word.charAt(i)), word, i+1);
+        insert(vertex.vertices.get(word.charAt(i)), word, token_description, i+1);
         // next vertex is null but it is not the last
       }
     } else {
       if (word.length() <= i+1){
-        lower_vertex.token = word;
+        lower_vertex.token = token_description;
       } else {
-        insert(lower_vertex, word, i+1);
+        insert(lower_vertex, word, token_description, i+1);
         // next vertex exists and there is more after
       }
     }
