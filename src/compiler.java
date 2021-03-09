@@ -1,6 +1,8 @@
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class compiler {
   public static void main(String[] args) {
@@ -68,6 +70,10 @@ class lex{
     Graph_vertex.insert(head,"true", "BOOL_VAL [TRUE]");
     System.out.println();
   }
+  static boolean is_valid_char(char c){
+    //TODO write function
+    return true;
+  }
 }
 class Graph_vertex{
   String token;
@@ -125,6 +131,11 @@ class Char_stream {
   int line_numb;
   int line_position;
   String line;
+  // the history allows us to backtrack the char stream
+  // lexer uses this to backtrack to right after a successful match
+  Queue<Character> history;
+  boolean pulling_from_history;
+  int history_line_position;
 
   Char_stream(InputStream source){
     this.source = new Scanner(source);
@@ -133,19 +144,46 @@ class Char_stream {
       line_numb = 1;
       line_position = 0;
     }
+    history = new LinkedList<>();
+    pulling_from_history = false;
   }
 
   char next_char(){
-    if (line_position < line.length()){// plus one cause compensates for String start at 1 but line numbering starts at 1
+    if (pulling_from_history){
+      char c = history.poll();
+      if (history.size() <= 0) {
+        pulling_from_history = false;
+      }
       line_position++;
-      return line.charAt(line_position - 1);// minus one for increase second minus one cause String starts at zero but line numbering starts at 1
+      return c;
+    }
+    else if (line_position < line.length()){// plus one cause compensates for String start at 1 but line numbering starts at 1
+      line_position++;
+      char c = line.charAt(line_position - 1); // minus one for increase second minus one cause String starts at zero but line numbering starts at 1
+      if (history.size() == 0){
+        history_line_position = line_position;
+      }
+      history.add(c);
+      return c;
     } else if (source.hasNext()){
       line = source.nextLine();
       line_numb++;
       line_position = 0;
       return '\n';
     } else{
-      return Character.MIN_VALUE;
+      return Character.MIN_VALUE; //
     }
+  }
+  void clear_history(){
+    if (pulling_from_history){
+      history_line_position = line_position;
+    } else {
+      history.clear();
+    }
+  }
+  void start_using_history(){
+    // after calling this line_position is meaningless until another char is called
+    pulling_from_history = true;
+    line_position = history_line_position - 1;
   }
 }
