@@ -7,11 +7,11 @@ import java.util.Queue;
 public class compiler {
   public static void main(String[] args) {
     Char_stream stream = new Char_stream(System.in);
-    lex.lexer();
+    lex.lexer(stream);
   }
 }
 class lex{
-  static void lexer(){
+  static void lexer(Char_stream stream){
     Graph_vertex head = new Graph_vertex("");
 
     // build graph
@@ -54,6 +54,7 @@ class lex{
     Graph_vertex.insert(head,"+", "ADDITION");
     Graph_vertex.insert(head,"==", "EQUALITY_OP");
     Graph_vertex.insert(head,"!=", "INEQUALITY_OP");
+    Graph_vertex.insert(head,"=","ASSIGNMENT_OP");
     Graph_vertex.insert(head,"{", "OPEN_BRACE");
     Graph_vertex.insert(head,"}", "CLOSE_BRACE");
     Graph_vertex.insert(head,"(", "OPEN_PARENTHESISE");
@@ -68,11 +69,41 @@ class lex{
     Graph_vertex.insert(head,"boolean", "VARIABLE_TYPE [BOOL]");
     Graph_vertex.insert(head,"false", "BOOL_VAL [FALSE]");
     Graph_vertex.insert(head,"true", "BOOL_VAL [TRUE]");
-    System.out.println();
+
+    // lexing
+    Graph_vertex longest_match = null;
+    Graph_vertex current_pos = head;
+    Graph_vertex next_pos;
+    char current_char;
+
+    do {
+      current_char = stream.next_char();
+      if (is_invalid_char(current_char)){
+        break;
+      }
+
+      next_pos = current_pos.vertices.get(current_char);
+
+      if (next_pos == null){
+        if (longest_match != null) {
+          System.out.println(longest_match.token);
+          longest_match = null;
+          current_pos = head;
+          stream.start_using_history();
+        }
+      } else {
+        current_pos = next_pos;
+        if (!current_pos.token.equals("")){
+          longest_match = current_pos;
+          stream.clear_history();
+        }
+      }
+    } while (current_char != Character.MIN_VALUE);
+
   }
-  static boolean is_valid_char(char c){
+  static boolean is_invalid_char(char c){
     //TODO write function
-    return true;
+    return false;
   }
 }
 class Graph_vertex{
@@ -171,7 +202,7 @@ class Char_stream {
       line_position = 0;
       return '\n';
     } else{
-      return Character.MIN_VALUE; //
+      return Character.MIN_VALUE; // end of file
     }
   }
   void clear_history(){
