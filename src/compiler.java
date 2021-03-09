@@ -183,7 +183,9 @@ class Char_stream {
   }
   void start_using_history(){
     // after calling this line_position is meaningless until another char is called
-    pulling_from_history = true;
-    line_position = history_line_position - 1;
+    if (history.size() > 0) {
+      pulling_from_history = true;
+      line_position = history_line_position - 1;
+    }
   }
 }
