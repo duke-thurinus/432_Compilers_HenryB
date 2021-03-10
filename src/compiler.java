@@ -14,7 +14,7 @@ class lex{
   static void lexer(Char_stream stream){
     Graph_vertex head = new Graph_vertex("");
 
-    // build graph
+    // build graph of the language grammar
     Graph_vertex.insert(head,"a", "ID [a]");
     Graph_vertex.insert(head,"b", "ID [b]");
     Graph_vertex.insert(head,"c", "ID [c]");
