@@ -16,6 +16,7 @@ class lex{
 
     String QUOTE_MARK_TOKEN = "QUOTE_MARK";
     String COMMENT_START_TOKEN = "COMMENT_START";
+    String END_OF_PROGRAM_TOKEN = "END_OF_PROGRAM";
 
     // build graph of the language grammar
     Graph_vertex.insert(head,"a", "ID [a]");
@@ -72,8 +73,10 @@ class lex{
     Graph_vertex.insert(head,"boolean", "VARIABLE_TYPE [BOOL]");
     Graph_vertex.insert(head,"false", "BOOL_VAL [FALSE]");
     Graph_vertex.insert(head,"true", "BOOL_VAL [TRUE]");
+    Graph_vertex.insert(head,"$", END_OF_PROGRAM_TOKEN);
 
     // lexing
+    int program = 0;
     Graph_vertex longest_match = null;
     int next_match_line_numb = 0;
     int next_match_line_pos = 0;
@@ -82,11 +85,17 @@ class lex{
     char current_char;
     boolean in_quotes = false;
     boolean in_comment = false;
+    boolean program_error = false;
+    boolean start_of_program = true;
 
     do {
       current_char = stream.next_char();
       if (is_invalid_char(current_char)){
         break;
+      }
+      if (current_char != Character.MIN_VALUE && start_of_program){
+        System.out.println("LEXER--> LEXING PROGRAM " + program);
+        start_of_program = false;
       }
 
       if (in_comment) {
@@ -94,11 +103,37 @@ class lex{
         while (last_char != '*' && current_char != '/'){
           last_char = current_char;
           current_char = stream.next_char();
+          if (current_char == Character.MIN_VALUE){
+            System.out.println("LEXER--> WARNING AT LINE "+stream.line_numb+": Comment Never Closed");
+            break;
+          }
         }
         stream.clear_history();
         in_comment = false;
       } else if (in_quotes){
+        StringBuilder string_expression = new StringBuilder();
+        while (current_char != '"'){
+          if (!((current_char >= 'a' && current_char <= 'z') || (current_char >= 'A' && current_char <= 'Z'))){
+            // only letters allowed in STRING_EXPRESSIONS
+            System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR ["+ current_char +"] IN STRING_EXPRESSION");
+            program_error = true;
+            break;
+          }
+          string_expression.append(current_char);
+          current_char = stream.next_char();
+          if (current_char == Character.MIN_VALUE){
+            break;
+          }
+        }
+        if (!program_error) {
+          stream.clear_history();
+          System.out.print("LEXER--> STRING_EXPRESSION [" + string_expression + "]"); // output match
+          System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
 
+          System.out.print("LEXER--> " + QUOTE_MARK_TOKEN);
+          System.out.println(" at line: " + stream.line_numb + " position: " + stream.line_position);
+        }
+        in_quotes = false;
       }else {
         if (current_pos.equals(head)){ // save token position when starting to match a new token
           next_match_line_numb = stream.line_numb;
@@ -111,8 +146,13 @@ class lex{
           if (longest_match != null) {
             if (longest_match.token.equals(COMMENT_START_TOKEN)){
               in_comment = true;
+            } else if (longest_match.token.equals(END_OF_PROGRAM_TOKEN)){
+              System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
+              program++;
+              start_of_program = true;
             } else {
-              System.out.print(longest_match.token); // output match
+              // output match
+              System.out.print("LEXER--> " + longest_match.token);
               System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
               in_quotes = longest_match.token.equals(QUOTE_MARK_TOKEN); // check if quote has started
             }
@@ -129,7 +169,10 @@ class lex{
         }
       }
     } while (current_char != Character.MIN_VALUE);
-
+    if (!start_of_program){
+      System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
+      System.out.println("LEXER--> WARNING: No $ at end of file");
+    }
   }
   static boolean is_invalid_char(char c){
     //TODO write function
