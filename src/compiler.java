@@ -1,8 +1,5 @@
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class compiler {
   public static void main(String[] args) {
@@ -75,6 +72,10 @@ class lex{
     Graph_vertex.insert(head,"true", "BOOL_VAL [TRUE]");
     Graph_vertex.insert(head,"$", END_OF_PROGRAM_TOKEN);
 
+    Graph_vertex.valid_chars.add(' ');
+    Graph_vertex.valid_chars.add('\n');
+    Graph_vertex.valid_chars.add(Character.MIN_VALUE);
+
     // lexing
     int program = 0;
     Graph_vertex longest_match = null;
@@ -90,83 +91,101 @@ class lex{
 
     do {
       current_char = stream.next_char();
-      if (is_invalid_char(current_char)){
-        break;
-      }
-      if (current_char != Character.MIN_VALUE && start_of_program){
-        System.out.println("LEXER--> LEXING PROGRAM " + program);
-        start_of_program = false;
-      }
-
-      if (in_comment) {
-        char last_char = current_char;
-        while (last_char != '*' && current_char != '/'){
-          last_char = current_char;
-          current_char = stream.next_char();
-          if (current_char == Character.MIN_VALUE){
-            System.out.println("LEXER--> WARNING AT LINE "+stream.line_numb+": Comment Never Closed");
-            break;
-          }
-        }
-        stream.clear_history();
-        in_comment = false;
-      } else if (in_quotes){
-        StringBuilder string_expression = new StringBuilder();
-        while (current_char != '"'){
-          if (!((current_char >= 'a' && current_char <= 'z') || (current_char >= 'A' && current_char <= 'Z'))){
-            // only letters allowed in STRING_EXPRESSIONS
-            System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR ["+ current_char +"] IN STRING_EXPRESSION");
-            program_error = true;
-            break;
-          }
-          string_expression.append(current_char);
-          current_char = stream.next_char();
-          if (current_char == Character.MIN_VALUE){
-            break;
-          }
-        }
-        if (!program_error) {
-          stream.clear_history();
-          System.out.print("LEXER--> STRING_EXPRESSION [" + string_expression + "]"); // output match
-          System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
-
-          System.out.print("LEXER--> " + QUOTE_MARK_TOKEN);
-          System.out.println(" at line: " + stream.line_numb + " position: " + stream.line_position);
-        }
-        in_quotes = false;
-      }else {
-        if (current_pos.equals(head)){ // save token position when starting to match a new token
-          next_match_line_numb = stream.line_numb;
-          next_match_line_pos = stream.line_position;
-        }
-
-        next_pos = current_pos.vertices.get(current_char);
-
-        if (next_pos == null){
-          if (longest_match != null) {
-            if (longest_match.token.equals(COMMENT_START_TOKEN)){
-              in_comment = true;
-            } else if (longest_match.token.equals(END_OF_PROGRAM_TOKEN)){
-              System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
-              program++;
-              start_of_program = true;
-            } else {
-              // output match
-              System.out.print("LEXER--> " + longest_match.token);
-              System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
-              in_quotes = longest_match.token.equals(QUOTE_MARK_TOKEN); // check if quote has started
-            }
-            longest_match = null;
-            current_pos = head;
-            stream.start_using_history();
-          }
+      if ((!program_error) && is_in_valid_char(current_char)){
+        if (current_char == '\t'){
+          System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR [ tab ] if tabs are illegal the debates will finally be over :)");
         } else {
-          current_pos = next_pos;
-          if (!current_pos.token.equals("")){
-            longest_match = current_pos;
+          System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR [ " + current_char + " ]");
+        }
+        program_error = true;
+      }
+      if (!program_error) {
+        if (current_char != Character.MIN_VALUE && start_of_program) {
+          System.out.println("LEXER--> LEXING PROGRAM " + program + "...");
+          start_of_program = false;
+        }
+
+        if (in_comment) {
+          char last_char = current_char;
+          while (last_char != '*' && current_char != '/') {
+            last_char = current_char;
+            current_char = stream.next_char();
+            if (current_char == Character.MIN_VALUE) {
+              System.out.println("LEXER--> WARNING AT LINE " + stream.line_numb + ": Comment Never Closed");
+              break;
+            }
+          }
+          stream.clear_history();
+          in_comment = false;
+        } else if (in_quotes) {
+          StringBuilder string_expression = new StringBuilder();
+          while (current_char != '"') {
+            if (!((current_char >= 'a' && current_char <= 'z') || (current_char >= 'A' && current_char <= 'Z'))) {
+              // only letters allowed in STRING_EXPRESSIONS
+              System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR [ " + current_char + " ] IN STRING_EXPRESSION");
+              program_error = true;
+              break;
+            }
+            string_expression.append(current_char);
+            current_char = stream.next_char();
+            if (current_char == Character.MIN_VALUE) {
+              break;
+            }
+          }
+          if (!program_error) {
             stream.clear_history();
+            System.out.print("LEXER--> STRING_EXPRESSION [" + string_expression + "]"); // output match
+            System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
+
+            System.out.print("LEXER--> " + QUOTE_MARK_TOKEN);
+            System.out.println(" at line: " + stream.line_numb + " position: " + stream.line_position);
+          }
+          in_quotes = false;
+        } else {
+          if (current_pos.equals(head)) { // save token position when starting to match a new token
+            next_match_line_numb = stream.line_numb;
+            next_match_line_pos = stream.line_position;
+          }
+
+          next_pos = current_pos.vertices.get(current_char);
+
+          if (next_pos == null) {
+            if (longest_match != null) {
+              if (longest_match.token.equals(COMMENT_START_TOKEN)) {
+                in_comment = true;
+              } else if (longest_match.token.equals(END_OF_PROGRAM_TOKEN)) {
+                System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
+                program++;
+                start_of_program = true;
+              } else {
+                // output match
+                System.out.print("LEXER--> " + longest_match.token);
+                System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
+                in_quotes = longest_match.token.equals(QUOTE_MARK_TOKEN); // check if quote has started
+              }
+              longest_match = null;
+              current_pos = head;
+              stream.start_using_history();
+            }
+          } else {
+            current_pos = next_pos;
+            if (!current_pos.token.equals("")) {
+              longest_match = current_pos;
+              stream.clear_history();
+            }
           }
         }
+      } else {
+        System.out.println("Lexer--> PROGRAM " + program + " FAILED LEX");
+        start_of_program = true;
+        program++;
+        stream.clear_history();
+        longest_match = null;
+        current_pos = head;
+        while (current_char != '$') {
+          current_char = stream.next_char();
+        }
+        program_error = false;
       }
     } while (current_char != Character.MIN_VALUE);
     if (!start_of_program){
@@ -174,12 +193,12 @@ class lex{
       System.out.println("LEXER--> WARNING: No $ at end of file");
     }
   }
-  static boolean is_invalid_char(char c){
-    //TODO write function
-    return false;
+  static boolean is_in_valid_char(char c){
+    return !(Graph_vertex.valid_chars.contains(c));
   }
 }
 class Graph_vertex{
+  static Set<Character> valid_chars = new HashSet<Character>();
   String token;
   HashMap<Character, Graph_vertex> vertices;
 
@@ -192,9 +211,11 @@ class Graph_vertex{
     if (lower_vertex == null){
       if (word.length() == 1) {
         vertex.vertices.put(word.charAt(0), new Graph_vertex(token_description));
+        valid_chars.add(word.charAt(0));
         // this is the end of insert and but last vertex is null
       } else {
         vertex.vertices.put(word.charAt(0), new Graph_vertex(""));
+        valid_chars.add(word.charAt(0));
         insert(vertex.vertices.get(word.charAt(0)), word, token_description, 1);
         // next vertex is null but it is not the last
       }
@@ -213,9 +234,11 @@ class Graph_vertex{
     if (lower_vertex == null){
       if (word.length() <= i+1) {
         vertex.vertices.put(word.charAt(i), new Graph_vertex(token_description));
+        valid_chars.add(word.charAt(i));
         // this is the end of insert and but last vertex is null
       } else {
         vertex.vertices.put(word.charAt(i), new Graph_vertex(""));
+        valid_chars.add(word.charAt(i));
         insert(vertex.vertices.get(word.charAt(i)), word, token_description, i+1);
         // next vertex is null but it is not the last
       }
