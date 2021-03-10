@@ -14,6 +14,9 @@ class lex{
   static void lexer(Char_stream stream){
     Graph_vertex head = new Graph_vertex("");
 
+    String QUOTE_MARK_TOKEN = "QUOTE_MARK";
+    String COMMENT_START_TOKEN = "COMMENT_START";
+
     // build graph of the language grammar
     Graph_vertex.insert(head,"a", "ID [a]");
     Graph_vertex.insert(head,"b", "ID [b]");
@@ -59,8 +62,8 @@ class lex{
     Graph_vertex.insert(head,"}", "CLOSE_BRACE");
     Graph_vertex.insert(head,"(", "OPEN_PARENTHESISE");
     Graph_vertex.insert(head,")", "CLOSED_PARENTHESISE");
-    Graph_vertex.insert(head,"\"", "QUOTE_MARK");
-    Graph_vertex.insert(head,"/*", "COMMENT_START");
+    Graph_vertex.insert(head,"\"", QUOTE_MARK_TOKEN);
+    Graph_vertex.insert(head,"/*", COMMENT_START_TOKEN);
     Graph_vertex.insert(head,"print", "PRINT");
     Graph_vertex.insert(head,"while", "WHILE");
     Graph_vertex.insert(head,"if", "IF");
@@ -72,9 +75,13 @@ class lex{
 
     // lexing
     Graph_vertex longest_match = null;
+    int next_match_line_numb = 0;
+    int next_match_line_pos = 0;
     Graph_vertex current_pos = head;
     Graph_vertex next_pos;
     char current_char;
+    boolean in_quotes = false;
+    boolean in_comment = false;
 
     do {
       current_char = stream.next_char();
@@ -82,20 +89,43 @@ class lex{
         break;
       }
 
-      next_pos = current_pos.vertices.get(current_char);
-
-      if (next_pos == null){
-        if (longest_match != null) {
-          System.out.println(longest_match.token);
-          longest_match = null;
-          current_pos = head;
-          stream.start_using_history();
+      if (in_comment) {
+        char last_char = current_char;
+        while (last_char != '*' && current_char != '/'){
+          last_char = current_char;
+          current_char = stream.next_char();
         }
-      } else {
-        current_pos = next_pos;
-        if (!current_pos.token.equals("")){
-          longest_match = current_pos;
-          stream.clear_history();
+        stream.clear_history();
+        in_comment = false;
+      } else if (in_quotes){
+
+      }else {
+        if (current_pos.equals(head)){ // save token position when starting to match a new token
+          next_match_line_numb = stream.line_numb;
+          next_match_line_pos = stream.line_position;
+        }
+
+        next_pos = current_pos.vertices.get(current_char);
+
+        if (next_pos == null){
+          if (longest_match != null) {
+            if (longest_match.token.equals(COMMENT_START_TOKEN)){
+              in_comment = true;
+            } else {
+              System.out.print(longest_match.token); // output match
+              System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
+              in_quotes = longest_match.token.equals(QUOTE_MARK_TOKEN); // check if quote has started
+            }
+            longest_match = null;
+            current_pos = head;
+            stream.start_using_history();
+          }
+        } else {
+          current_pos = next_pos;
+          if (!current_pos.token.equals("")){
+            longest_match = current_pos;
+            stream.clear_history();
+          }
         }
       }
     } while (current_char != Character.MIN_VALUE);
