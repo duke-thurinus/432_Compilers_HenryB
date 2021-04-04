@@ -107,7 +107,7 @@ class lex{
 
         if (in_comment) {
           char last_char = current_char;
-          while (last_char != '*' && current_char != '/') {
+          while (last_char != '*' || current_char != '/') {
             last_char = current_char;
             current_char = stream.next_char();
             if (current_char == Character.MIN_VALUE) {
