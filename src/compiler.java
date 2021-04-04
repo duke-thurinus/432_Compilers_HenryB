@@ -120,7 +120,7 @@ class lex{
         } else if (in_quotes) {
           StringBuilder string_expression = new StringBuilder();
           while (current_char != '"') {
-            if (!((current_char >= 'a' && current_char <= 'z') || (current_char >= 'A' && current_char <= 'Z'))) {
+            if (!((current_char >= 'a' && current_char <= 'z') || current_char == ' ')) {
               // only letters allowed in STRING_EXPRESSIONS
               System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR [ " + current_char + " ] IN STRING_EXPRESSION");
               program_error = true;
