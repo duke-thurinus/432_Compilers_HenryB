@@ -166,6 +166,10 @@ class lex{
               longest_match = null;
               current_pos = head;
               stream.start_using_history();
+            } else if (!current_pos.equals(head)){
+              //failed to build token
+              System.out.println("LEXER--> ERROR AT LINE " + next_match_line_numb + " CHAR " + next_match_line_pos);
+              program_error = true;
             }
           } else {
             current_pos = next_pos;
