@@ -2,7 +2,7 @@ import java.io.InputStream;
 import java.util.*;
 
 class lex{
-  static void lexer(Char_stream stream){
+  static Token_stream lexer(Char_stream char_stream){
     Graph_vertex head = new Graph_vertex("");
 
     String QUOTE_MARK_TOKEN = "QUOTE_MARK";
@@ -83,62 +83,89 @@ class lex{
     boolean program_error = false;
     boolean start_of_program = true;
 
+    Token_stream stream_head = new Program_start_token(0,0,1);
+    Token_stream current_stream_pos = stream_head;
+    Token_stream current_program_start = stream_head;
+    boolean start_of_file = true;
+
     do {
-      current_char = stream.next_char();
+      current_char = char_stream.next_char();
       if ((!program_error) && is_in_valid_char(current_char)){
+        current_stream_pos.next_token = new Token_stream("ERROR" , char_stream.line_numb,char_stream.line_position);
+        current_stream_pos = current_stream_pos.next_token;
         if (current_char == '\t'){
-          System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR [ tab ] if tabs are illegal the debates will finally be over :)");
+//          System.out.println("LEXER--> ERROR AT LINE " + char_stream.line_numb + ": INVALID CHAR [ tab ] if tabs are illegal the debates will finally be over :)");
+          current_stream_pos.token_description = "LEXER--> ERROR AT LINE " + char_stream.line_numb + ": INVALID CHAR [ tab ] if tabs are illegal the debates will finally be over :)";
         } else {
-          System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR [ " + current_char + " ]");
+//          System.out.println("LEXER--> ERROR AT LINE " + char_stream.line_numb + ": INVALID CHAR [ " + current_char + " ]");
+          current_stream_pos.token_description = "LEXER--> ERROR AT LINE " + char_stream.line_numb + ": INVALID CHAR [ " + current_char + " ]";
         }
         program_error = true;
       }
       if (!program_error) {
         if (current_char != Character.MIN_VALUE && start_of_program) {
-          System.out.println("LEXER--> LEXING PROGRAM " + program + "...");
+//          System.out.println("LEXER--> LEXING PROGRAM " + program + "...");
+          if (!start_of_file){
+            current_stream_pos.next_token = new Program_start_token(char_stream.line_numb,char_stream.line_position, program);
+            current_stream_pos = current_stream_pos.next_token;
+            current_program_start = current_stream_pos;
+          }
           start_of_program = false;
+          start_of_file = false;
         }
 
         if (in_comment) {
           char last_char = current_char;
           while (last_char != '*' || current_char != '/') {
             last_char = current_char;
-            current_char = stream.next_char();
+            current_char = char_stream.next_char();
             if (current_char == Character.MIN_VALUE) {
-              System.out.println("LEXER--> WARNING AT LINE " + stream.line_numb + ": Comment Never Closed");
+//              System.out.println("LEXER--> WARNING AT LINE " + char_stream.line_numb + ": Comment Never Closed");
+              current_stream_pos.next_token = new Token_stream("WARNING" , char_stream.line_numb,char_stream.line_position);
+              current_stream_pos = current_stream_pos.next_token;
+              current_stream_pos.token_description = "LEXER--> WARNING AT LINE " + char_stream.line_numb + ": Comment Never Closed";
               break;
             }
           }
-          stream.clear_history();
+          char_stream.clear_history();
           in_comment = false;
         } else if (in_quotes) {
           StringBuilder string_expression = new StringBuilder();
           while (current_char != '"') {
             if (!((current_char >= 'a' && current_char <= 'z') || current_char == ' ')) {
               // only letters allowed in STRING_EXPRESSIONS
-              System.out.println("LEXER--> ERROR AT LINE " + stream.line_numb + ": INVALID CHAR [ " + current_char + " ] IN STRING_EXPRESSION");
+//              System.out.println("LEXER--> ERROR AT LINE " + char_stream.line_numb + ": INVALID CHAR [ " + current_char + " ] IN STRING_EXPRESSION");
+              current_stream_pos.next_token = new Token_stream("ERROR" , char_stream.line_numb,char_stream.line_position);
+              current_stream_pos = current_stream_pos.next_token;
+              current_stream_pos.token_description = "LEXER--> ERROR AT LINE " + char_stream.line_numb + ": INVALID CHAR [ " + current_char + " ] IN STRING_EXPRESSION";
               program_error = true;
               break;
             }
             string_expression.append(current_char);
-            current_char = stream.next_char();
+            current_char = char_stream.next_char();
             if (current_char == Character.MIN_VALUE) {
               break;
             }
           }
           if (!program_error) {
-            stream.clear_history();
-            System.out.print("LEXER--> STRING_EXPRESSION [" + string_expression + "]"); // output match
-            System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
+            char_stream.clear_history();
+//            System.out.print("LEXER--> STRING_EXPRESSION [" + string_expression + "]"); // output match
+//            System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
+            current_stream_pos.next_token = new Token_stream("STRING_EXPRESSION" , char_stream.line_numb,char_stream.line_position);
+            current_stream_pos = current_stream_pos.next_token;
+            current_stream_pos.token_description = string_expression.toString();
 
-            System.out.print("LEXER--> " + QUOTE_MARK_TOKEN);
-            System.out.println(" at line: " + stream.line_numb + " position: " + stream.line_position);
+
+//            System.out.print("LEXER--> " + QUOTE_MARK_TOKEN);
+//            System.out.println(" at line: " + char_stream.line_numb + " position: " + char_stream.line_position);
+            current_stream_pos.next_token = new Token_stream(QUOTE_MARK_TOKEN , char_stream.line_numb,char_stream.line_position);
+            current_stream_pos = current_stream_pos.next_token;
           }
           in_quotes = false;
         } else {
           if (current_pos.equals(head)) { // save token position when starting to match a new token
-            next_match_line_numb = stream.line_numb;
-            next_match_line_pos = stream.line_position;
+            next_match_line_numb = char_stream.line_numb;
+            next_match_line_pos = char_stream.line_position;
           }
 
           next_pos = current_pos.vertices.get(current_char);
@@ -148,48 +175,61 @@ class lex{
               if (longest_match.token.equals(COMMENT_START_TOKEN)) {
                 in_comment = true;
               } else if (longest_match.token.equals(END_OF_PROGRAM_TOKEN)) {
-                System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
+//                System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
+                current_stream_pos.next_token = new Token_stream(END_OF_PROGRAM_TOKEN , next_match_line_numb, next_match_line_pos);
+                current_stream_pos = current_stream_pos.next_token;
                 program++;
                 start_of_program = true;
               } else {
                 // output match
-                System.out.print("LEXER--> " + longest_match.token);
-                System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
+//                System.out.print("LEXER--> " + longest_match.token);
+//                System.out.println(" at line: " + next_match_line_numb + " position: " + next_match_line_pos);
+                current_stream_pos.next_token = new Token_stream(longest_match.token , next_match_line_numb, next_match_line_pos);
+                current_stream_pos = current_stream_pos.next_token;
                 in_quotes = longest_match.token.equals(QUOTE_MARK_TOKEN); // check if quote has started
               }
               longest_match = null;
               current_pos = head;
-              stream.start_using_history();
+              char_stream.start_using_history();
             } else if (!current_pos.equals(head)){
               //failed to build token
-              System.out.println("LEXER--> ERROR AT LINE " + next_match_line_numb + " CHAR " + next_match_line_pos);
+//              System.out.println("LEXER--> ERROR AT LINE " + next_match_line_numb + " CHAR " + next_match_line_pos);
+              current_stream_pos.next_token = new Token_stream("ERROR" , next_match_line_numb ,next_match_line_pos);
+              current_stream_pos = current_stream_pos.next_token;
               program_error = true;
             }
           } else {
             current_pos = next_pos;
             if (!current_pos.token.equals("")) {
               longest_match = current_pos;
-              stream.clear_history();
+              char_stream.clear_history();
             }
           }
         }
       } else {
-        System.out.println("Lexer--> PROGRAM " + program + " FAILED LEX");
+//        System.out.println("Lexer--> PROGRAM " + program + " FAILED LEX");
+        current_stream_pos.next_token = new Token_stream(END_OF_PROGRAM_TOKEN , char_stream.line_numb,char_stream.line_position);
+        current_stream_pos = current_stream_pos.next_token;
+
         start_of_program = true;
         program++;
-        stream.clear_history();
+        char_stream.clear_history();
         longest_match = null;
         current_pos = head;
         while (current_char != '$') {
-          current_char = stream.next_char();
+          current_char = char_stream.next_char();
         }
         program_error = false;
       }
     } while (current_char != Character.MIN_VALUE);
     if (!start_of_program){
-      System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
-      System.out.println("LEXER--> WARNING: No $ at end of file");
+//      System.out.println("LEXER--> PROGRAM " + program + ": Lex completed with no errors");
+//      System.out.println("LEXER--> WARNING: No $ at end of file");
+      current_stream_pos.next_token = new Token_stream("WARNING" , char_stream.line_numb,char_stream.line_position);
+      current_stream_pos = current_stream_pos.next_token;
+      current_stream_pos.token_description = "WARNING: No $ at end of file";
     }
+    return stream_head;
   }
   static boolean is_in_valid_char(char c){
     return !(Graph_vertex.valid_chars.contains(c));
@@ -312,5 +352,40 @@ class Char_stream {
       pulling_from_history = true;
       line_position = history_line_position - 1;
     }
+  }
+}
+
+class Token_stream{
+  String token;
+  String token_description;
+  int line_numb;
+  int line_pos;
+  Token_stream next_token;
+
+  Token_stream(){}
+
+  Token_stream(String token, int line_numb, int line_pos){
+    this.token = token;
+    this.line_numb = line_numb;
+    this.line_pos = line_pos;
+  }
+
+  void print_self(){
+    System.out.println(this.token);
+    if (next_token != null){
+      next_token.print_self();
+    }
+  }
+}
+
+class Program_start_token extends Token_stream{
+  int program_numb;
+  boolean passed_lex;
+
+  Program_start_token(int line_numb, int line_pos, int program_numb){
+    this.token = "PROGRAM START";
+    this.line_numb = line_numb;
+    this.line_pos = line_pos;
+    this.program_numb = program_numb;
   }
 }
