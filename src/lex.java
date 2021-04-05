@@ -83,9 +83,9 @@ class lex{
     boolean program_error = false;
     boolean start_of_program = true;
 
-    Token_stream stream_head = new Program_start_token(0,0,1);
+    Program_start_token stream_head = new Program_start_token(0,0,1);
     Token_stream current_stream_pos = stream_head;
-    Token_stream current_program_start = stream_head;
+    Program_start_token current_program_start = stream_head;
     boolean start_of_file = true;
 
     do {
@@ -106,9 +106,10 @@ class lex{
         if (current_char != Character.MIN_VALUE && start_of_program) {
 //          System.out.println("LEXER--> LEXING PROGRAM " + program + "...");
           if (!start_of_file){
+
             current_stream_pos.next_token = new Program_start_token(char_stream.line_numb,char_stream.line_position, program);
             current_stream_pos = current_stream_pos.next_token;
-            current_program_start = current_stream_pos;
+            current_program_start = (Program_start_token) current_stream_pos;
           }
           start_of_program = false;
           start_of_file = false;
@@ -180,6 +181,7 @@ class lex{
                 current_stream_pos = current_stream_pos.next_token;
                 program++;
                 start_of_program = true;
+                current_program_start.passed_lex = true;
               } else {
                 // output match
 //                System.out.print("LEXER--> " + longest_match.token);
@@ -228,6 +230,7 @@ class lex{
       current_stream_pos.next_token = new Token_stream("WARNING" , char_stream.line_numb,char_stream.line_position);
       current_stream_pos = current_stream_pos.next_token;
       current_stream_pos.token_description = "WARNING: No $ at end of file";
+      current_program_start.passed_lex = true;
     }
     return stream_head;
   }
@@ -376,6 +379,9 @@ class Token_stream{
       next_token.print_self();
     }
   }
+  int getProgram_numb(){
+    return -1;
+  }
 }
 
 class Program_start_token extends Token_stream{
@@ -387,5 +393,9 @@ class Program_start_token extends Token_stream{
     this.line_numb = line_numb;
     this.line_pos = line_pos;
     this.program_numb = program_numb;
+    passed_lex = false;
+  }
+  int getProgram_numb(){
+    return program_numb;
   }
 }
