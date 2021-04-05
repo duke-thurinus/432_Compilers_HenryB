@@ -216,7 +216,7 @@ class lex{
         char_stream.clear_history();
         longest_match = null;
         current_pos = head;
-        while (current_char != '$') {
+        while (current_char != '$' && current_char != Character.MIN_VALUE) {
           current_char = char_stream.next_char();
         }
         program_error = false;
