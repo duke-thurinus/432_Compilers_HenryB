@@ -50,8 +50,8 @@ class lex{
     Graph_vertex.insert(head,"==", "EQUALITY_OP");
     Graph_vertex.insert(head,"!=", "INEQUALITY_OP");
     Graph_vertex.insert(head,"=","ASSIGNMENT_OP");
-    Graph_vertex.insert(head,"{", "OPEN_BRACE");
-    Graph_vertex.insert(head,"}", "CLOSE_BRACE");
+    Graph_vertex.insert(head,"{", "OPEN_BRACKET");
+    Graph_vertex.insert(head,"}", "CLOSE_BRACKET");
     Graph_vertex.insert(head,"(", "OPEN_PARENTHESISE");
     Graph_vertex.insert(head,")", "CLOSED_PARENTHESISE");
     Graph_vertex.insert(head,"\"", QUOTE_MARK_TOKEN);
