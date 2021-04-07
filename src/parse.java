@@ -56,6 +56,7 @@ public class parse {
 
 
   void parser(Token_stream token_stream){
+    System.out.println(); // Just for spacing output
     this.token_stream = token_stream;
     while (this.token_stream != null && this.token_stream.token.equals(start_of_program_token)){
       if (trees != null){ //not the first program

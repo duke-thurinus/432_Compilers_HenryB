@@ -104,7 +104,7 @@ class lex{
       }
       if (!program_error) {
         if (current_char != Character.MIN_VALUE && start_of_program) {
-          System.out.println("LEXER--> LEXING PROGRAM " + program + "...");
+          System.out.println("\n\nLEXER--> LEXING PROGRAM " + program + "...");
           if (!start_of_file){
 
             current_stream_pos.next_token = new Program_start_token(char_stream.line_numb,char_stream.line_position, program);
