@@ -64,7 +64,7 @@ public class parse {
       System.out.println("PARSING --> Program " + token_stream.getProgram_numb());
       this.token_stream = this.token_stream.next_token;
       parse_program();
-      System.out.println();
+      this.current_tree.print_tree();
     }
   }
 
@@ -292,6 +292,11 @@ class CST {
       }
   }
 
+  void print_tree(){
+    System.out.println("CST for program " + this.program_numb);
+    root.print_down_tree(0);
+  }
+
 }
 
 class CST_node {
@@ -308,5 +313,19 @@ class CST_node {
     this.name = name;
     this.parent = parent;
     children = new CST_node[5];
+  }
+
+  void print_down_tree(int depth){
+    String string = "-".repeat(Math.max(0, depth)) +
+            " " +
+            this.name;
+    System.out.println(string);
+    for (CST_node child : children) {
+      if (child != null) {
+        child.print_down_tree(depth + 1);
+      } else {
+        break;
+      }
+    }
   }
 }
