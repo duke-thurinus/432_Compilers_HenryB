@@ -77,7 +77,7 @@ public class parse {
         this.current_tree.print_tree();
       } catch (Parse_error e){
         System.out.println("Parse Error at line: " + e.line_numb + " pos: " + e.line_pos +
-                " found: " + e.token + " was expecting: " + Arrays.toString(e.expected_tokens));
+                " found: " + e.token + " could have accepted " + Arrays.toString(e.expected_tokens));
         while (this.token_stream.next_token != null && !this.token_stream.token.equals(start_of_program_token)){
           this.token_stream = this.token_stream.next_token;
         }
