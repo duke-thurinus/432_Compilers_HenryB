@@ -83,7 +83,7 @@ class lex{
     boolean program_error = false;
     boolean start_of_program = true;
 
-    Program_start_token stream_head = new Program_start_token(0,0,1);
+    Program_start_token stream_head = new Program_start_token(0,0, program);
     Token_stream current_stream_pos = stream_head;
     Program_start_token current_program_start = stream_head;
     boolean start_of_file = true;
