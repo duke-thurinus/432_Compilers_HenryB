@@ -52,7 +52,7 @@ public class parse {
 
   void parser(Token_stream token_stream){
     this.token_stream = token_stream;
-    while (token_stream.token.equals(start_of_program_token)){
+    while (this.token_stream != null && this.token_stream.token.equals(start_of_program_token)){
       if (trees != null){ //not the first program
         trees.next_tree = new CST();
         current_tree = trees.next_tree;
