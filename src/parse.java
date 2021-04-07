@@ -360,7 +360,7 @@ class CST {
   }
 
   void print_tree(){
-    System.out.println("CST for program " + this.program_numb);
+    System.out.println("CST");
     root.print_down_tree(0);
   }
 
