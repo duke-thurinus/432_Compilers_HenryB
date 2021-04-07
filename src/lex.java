@@ -83,6 +83,7 @@ class lex{
     boolean program_error = false;
     boolean start_of_program = true;
 
+    // TODO: some of these variables are unnecessary and can be consolidated
     Program_start_token stream_head = new Program_start_token(0,0, program);
     Token_stream current_stream_pos = stream_head;
     Program_start_token current_program_start = stream_head;
