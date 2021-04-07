@@ -149,7 +149,7 @@ public class parse {
     current_tree.move_up_to_parent();
   }
 
-  void parse_var_decl(){
+  void parse_var_decl() throws Parse_error {
     current_tree.add_node(grammar_var_decl);
     parse_type();
     match(ID_tokens);
@@ -228,19 +228,19 @@ public class parse {
     current_tree.move_up_to_parent();
   }
 
-  void parse_type(){
+  void parse_type() throws Parse_error {
     current_tree.add_node(grammar_type);
     match(new String[]{type_int_token, type_string_token, type_bool_token});
     current_tree.move_up_to_parent();
   }
 
-  void parse_bool_op(){
+  void parse_bool_op() throws Parse_error {
     current_tree.add_node(grammar_bool_op);
     match(new String[]{equality_token, inequality_token});
     current_tree.move_up_to_parent();
   }
 
-  void parse_bool_val(){
+  void parse_bool_val() throws Parse_error {
     current_tree.add_node(grammar_bool_val);
     match(bool_vals);
     current_tree.move_up_to_parent();
@@ -271,9 +271,29 @@ public class parse {
     }
   }
 
-  void match(String[] tokens){
-    token_stream = token_stream.next_token;
-    //todo: this is temp, need to actually build
+  void match(String[] tokens) throws Parse_error {
+    for (String t : tokens){
+      if (t.equals(token_stream.token)){
+        current_tree.add_node(token_stream.token);
+        token_stream = token_stream.next_token;
+        current_tree.move_up_to_parent();
+        return;
+      }
+    }
+    // ERROR
+    String[] desired_tokens;
+    if (tokens[0].equals(digit_tokens[0])){
+      desired_tokens = new String[] {digit_token};
+    } else if (tokens[0].equals(ID_tokens[0])){
+      desired_tokens = new String[] {ID_token};
+    } else if (tokens[0].equals(bool_vals[0])){
+      desired_tokens = new String[] {bool_val_token};
+    } else {
+      desired_tokens = tokens;
+    }
+    throw new Parse_error(token_stream.line_numb, token_stream.line_pos,
+            desired_tokens,
+            token_stream.token);
   }
 
   static boolean is_ID(String token){
