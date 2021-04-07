@@ -186,7 +186,7 @@ class lex{
                 program++;
                 start_of_program = true;
                 current_program_start.passed_lex = true;
-                parser.parser(current_program_start);
+                parser.parser(current_program_start, verbose_mode);
               } else {
                 // output match
                 if (verbose_mode) {

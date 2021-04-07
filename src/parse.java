@@ -54,9 +54,12 @@ public class parse {
   static String grammar_bool_val = "BOOL VAL";
   static String grammar_int_op = "INT OP";
 
+  boolean verbose_mode;
 
-  void parser(Token_stream token_stream){
+
+  void parser(Token_stream token_stream, boolean verbose_mode){
     System.out.println(); // Just for spacing output
+    this.verbose_mode = verbose_mode;
     this.token_stream = token_stream;
     while (this.token_stream != null && this.token_stream.token.equals(start_of_program_token)){
       if (trees != null){ //not the first program
@@ -83,6 +86,7 @@ public class parse {
   }
 
   void parse_program() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_program()");
     current_tree.add_node(grammar_program);
     parse_block();
     match(END_OF_PROGRAM_TOKEN);
@@ -90,6 +94,7 @@ public class parse {
   }
 
   void parse_block() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_block()");
     current_tree.add_node(grammar_block);
     match(open_bracket_token);
     parse_statement_list();
@@ -98,6 +103,7 @@ public class parse {
   }
 
   void parse_statement_list() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_statement_list()");
     current_tree.add_node(grammar_statement_list);
     if (!token_stream.token.equals(close_bracket_token)) {
       parse_statement();
@@ -109,6 +115,7 @@ public class parse {
   }
 
   void parse_statement() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_statement()");
     current_tree.add_node(grammar_statement);
     if (token_stream.token.equals(print_token)) {
       parse_print_statement();
@@ -134,6 +141,7 @@ public class parse {
   }
 
   void parse_print_statement() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_print_statement()");
     current_tree.add_node(grammar_print_statement);
     match(print_token);
     match(OPEN_PARENTHESISE_TOKEN);
@@ -143,6 +151,7 @@ public class parse {
   }
 
   void parse_assignment_statement() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_assignment_statement()");
     current_tree.add_node(grammar_assignment_statement);
     match(ID_tokens);
     match(assignment_token);
@@ -151,6 +160,7 @@ public class parse {
   }
 
   void parse_var_decl() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_var_decl()");
     current_tree.add_node(grammar_var_decl);
     parse_type();
     match(ID_tokens);
@@ -158,6 +168,7 @@ public class parse {
   }
 
   void parse_while_statement() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_while_statement()");
     current_tree.add_node(grammar_while_statement);
     match(while_token);
     parse_bool_expr();
@@ -166,6 +177,7 @@ public class parse {
   }
 
   void parse_if_statement() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_if_statement()");
     current_tree.add_node(grammar_if_statement);
     match(if_token);
     parse_bool_expr();
@@ -174,6 +186,7 @@ public class parse {
   }
 
   void parse_expr() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_expr()");
     current_tree.add_node(grammar_expr);
     if (is_DIGIT(token_stream.token)){
       parse_int_expr();
@@ -193,6 +206,7 @@ public class parse {
   }
 
   void parse_int_expr() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_int_expr()");
     current_tree.add_node(grammar_int_expr);
     match(digit_tokens);
     if (token_stream.token.equals(addition_op_token)){
@@ -203,6 +217,7 @@ public class parse {
   }
 
   void parse_string_expr() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_string_expr()");
     current_tree.add_node(grammar_string_expr);
     match(quote_mark_token);
     parse_char_list();
@@ -211,6 +226,7 @@ public class parse {
   }
 
   void parse_bool_expr() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_bool_expr()");
     current_tree.add_node(grammar_bool_expr);
     if (token_stream.token.equals(OPEN_PARENTHESISE_TOKEN)) {
       match(OPEN_PARENTHESISE_TOKEN);
@@ -230,30 +246,35 @@ public class parse {
   }
 
   void parse_type() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_type()");
     current_tree.add_node(grammar_type);
     match(new String[]{type_int_token, type_string_token, type_bool_token});
     current_tree.move_up_to_parent();
   }
 
   void parse_bool_op() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_bool_op()");
     current_tree.add_node(grammar_bool_op);
     match(new String[]{equality_token, inequality_token});
     current_tree.move_up_to_parent();
   }
 
   void parse_bool_val() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_bool_val()");
     current_tree.add_node(grammar_bool_val);
     match(bool_vals);
     current_tree.move_up_to_parent();
   }
 
   void parse_addition() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_addition()");
     current_tree.add_node(grammar_int_op);
     match("ADDITION");
     current_tree.move_up_to_parent();
   }
 
   void parse_char_list() throws Parse_error {
+    if (verbose_mode) System.out.println("parse_char_list()");
     current_tree.add_node(grammar_char_list);
     match(string_expression);
     current_tree.move_up_to_parent();
