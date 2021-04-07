@@ -2,7 +2,7 @@ import java.io.InputStream;
 import java.util.*;
 
 class lex{
-  static Token_stream lexer(Char_stream char_stream, boolean verbose_mode){
+  static Token_stream lexer(Char_stream char_stream, parse parser, boolean verbose_mode){
     Graph_vertex head = new Graph_vertex("");
 
     String QUOTE_MARK_TOKEN = "QUOTE_MARK";
@@ -186,6 +186,7 @@ class lex{
                 program++;
                 start_of_program = true;
                 current_program_start.passed_lex = true;
+                parser.parser(current_program_start);
               } else {
                 // output match
                 if (verbose_mode) {
