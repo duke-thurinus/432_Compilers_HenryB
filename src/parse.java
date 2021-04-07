@@ -264,7 +264,7 @@ public class parse {
       token_stream = token_stream.next_token;
       current_tree.move_up_to_parent();
     } else {
-      //todo: throw error
+      // ERROR
       throw new Parse_error(token_stream.line_numb, token_stream.line_pos,
               new String[]{token},
               token_stream.token);
