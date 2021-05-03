@@ -1,5 +1,6 @@
 
 public class compiler {
+  static String COMMENT_START_TOKEN = "COMMENT_START";
   static String print_token = "PRINT";
   static String while_token = "WHILE";
   static String if_token = "IF";
