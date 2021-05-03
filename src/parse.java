@@ -190,16 +190,16 @@ public class parse {
     current_tree.add_node(grammar_expr);
     if (is_DIGIT(token_stream.token)){
       parse_int_expr();
-    } else if (token_stream.token.equals(type_string_token)){
+    } else if (token_stream.token.equals(quote_mark_token)){
       parse_string_expr();
-    } else if (token_stream.token.equals(type_bool_token)){
+    } else if (token_stream.token.equals(OPEN_PARENTHESISE_TOKEN) || is_BOOL(token_stream.token)){
       parse_bool_expr();
-    } else if (token_stream.token.equals(type_int_token)){
+    } else if (is_ID(token_stream.token)){
       match(ID_tokens);
     } else {
       // ERROR
       throw new Parse_error(token_stream.line_numb, token_stream.line_pos,
-              new String[]{digit_token, type_string_token, type_bool_token, type_int_token},
+              new String[]{digit_token, quote_mark_token, type_bool_token, type_int_token},
               token_stream.token);
     }
     current_tree.move_up_to_parent();
@@ -326,6 +326,10 @@ public class parse {
   static boolean is_DIGIT(String token){
     if (token.length() < 7) return false;
     return token.substring(0,7).equals("DIGIT [");
+  }
+
+  static  boolean is_BOOL(String token){
+    return (token.equals(bool_vals[0]) || token.equals(bool_vals[1]));
   }
 }
 
