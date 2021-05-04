@@ -2,8 +2,8 @@ import java.util.Arrays;
 
 public class parse extends compiler{
   Token_stream token_stream;
-  CST trees;
-  CST current_tree;
+  Syntax_tree trees;
+  Syntax_tree current_tree;
   boolean verbose_mode;
 
 
@@ -13,10 +13,10 @@ public class parse extends compiler{
     this.token_stream = token_stream;
     while (this.token_stream != null && this.token_stream.token.equals(start_of_program_token)){
       if (trees != null){ //not the first program
-        trees.next_tree = new CST();
+        trees.next_tree = new Syntax_tree();
         current_tree = trees.next_tree;
       } else { //first program, create tree
-        trees = new CST();
+        trees = new Syntax_tree();
         current_tree = trees;
       }
       trees.program_numb = token_stream.getProgram_numb();
@@ -280,74 +280,6 @@ public class parse extends compiler{
 
   static  boolean is_BOOL(String token){
     return (token.equals(bool_vals[0]) || token.equals(bool_vals[1]));
-  }
-}
-
-class CST {
-  CST_node root = null;
-  CST_node current = null;
-  CST next_tree = null;
-  int program_numb;
-
-  void add_node(String name){
-    if (root == null){
-      //make root
-      root = new CST_node(name);
-      current = root;
-    } else {
-      //new node
-      for (int i=0; i < current.children.length; i++){
-        if (current.children[i] == null){
-          current.children[i] = new CST_node(name);
-          current.children[i].parent = current;
-          current = current.children[i];
-          break;
-        }
-      }
-    }
-  }
-
-  void move_up_to_parent(){
-      if (current.parent != null){
-        current = current.parent;
-      }
-  }
-
-  void print_tree(){
-    System.out.println("CST");
-    root.print_down_tree(0);
-  }
-
-}
-
-class CST_node {
-  String name;
-  CST_node parent = null;
-  CST_node[] children;
-
-  CST_node(String name){
-    this.name = name;
-    children = new CST_node[5];
-  }
-
-  CST_node(String name, CST_node parent){
-    this.name = name;
-    this.parent = parent;
-    children = new CST_node[5];
-  }
-
-  void print_down_tree(int depth){
-    String string = "-".repeat(Math.max(0, depth)) +
-            " " +
-            this.name;
-    System.out.println(string);
-    for (CST_node child : children) {
-      if (child != null) {
-        child.print_down_tree(depth + 1);
-      } else {
-        break;
-      }
-    }
   }
 }
 
