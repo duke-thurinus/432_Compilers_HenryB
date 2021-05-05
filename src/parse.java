@@ -5,12 +5,14 @@ public class parse extends compiler{
   Syntax_tree trees;
   Syntax_tree current_tree;
   boolean verbose_mode;
+  Syntax_tree AST;
 
 
   void parser(Token_stream token_stream, boolean verbose_mode){
     System.out.println(); // Just for spacing output
     this.verbose_mode = verbose_mode;
     this.token_stream = token_stream;
+    AST = new Syntax_tree();
     while (this.token_stream != null && this.token_stream.token.equals(start_of_program_token)){
       if (trees != null){ //not the first program
         trees.next_tree = new Syntax_tree();
@@ -24,7 +26,7 @@ public class parse extends compiler{
       this.token_stream = this.token_stream.next_token;
       try {
         parse_program();
-        this.current_tree.print_tree();
+        this.current_tree.print_tree("CST");
       } catch (Parse_error e){
         System.out.println("Parse Error at line: " + e.line_numb + " pos: " + e.line_pos +
                 " found: " + e.token + " could have accepted " + Arrays.toString(e.expected_tokens));
@@ -33,6 +35,7 @@ public class parse extends compiler{
         }
       }
     }
+    semantic_analysis.analysis(AST, verbose_mode);
   }
 
   void parse_program() throws Parse_error {
@@ -46,10 +49,12 @@ public class parse extends compiler{
   void parse_block() throws Parse_error {
     if (verbose_mode) System.out.println("parse_block()");
     current_tree.add_node(grammar_block);
+    AST.add_node(grammar_block);
     match(open_bracket_token);
     parse_statement_list();
     match(close_bracket_token);
     current_tree.move_up_to_parent();
+    AST.move_up_to_parent();
   }
 
   void parse_statement_list() throws Parse_error {
@@ -93,6 +98,7 @@ public class parse extends compiler{
   void parse_print_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_print_statement()");
     current_tree.add_node(grammar_print_statement);
+    AST.add_node(grammar_print_statement);
     match(print_token);
     match(OPEN_PARENTHESISE_TOKEN);
     parse_expr();
@@ -103,36 +109,44 @@ public class parse extends compiler{
   void parse_assignment_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_assignment_statement()");
     current_tree.add_node(grammar_assignment_statement);
+    AST.add_node(grammar_assignment_statement);
     match(ID_tokens);
     match(assignment_token);
     parse_expr();
     current_tree.move_up_to_parent();
+    AST.move_up_to_parent();
   }
 
   void parse_var_decl() throws Parse_error {
     if (verbose_mode) System.out.println("parse_var_decl()");
     current_tree.add_node(grammar_var_decl);
+    AST.add_node(grammar_var_decl);
     parse_type();
     match(ID_tokens);
     current_tree.move_up_to_parent();
+    AST.move_up_to_parent();
   }
 
   void parse_while_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_while_statement()");
     current_tree.add_node(grammar_while_statement);
+    AST.add_node(grammar_while_statement);
     match(while_token);
     parse_bool_expr();
     parse_block();
     current_tree.move_up_to_parent();
+    AST.move_up_to_parent();
   }
 
   void parse_if_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_if_statement()");
     current_tree.add_node(grammar_if_statement);
+    AST.add_node(grammar_if_statement);
     match(if_token);
     parse_bool_expr();
     parse_block();
     current_tree.move_up_to_parent();
+    AST.move_up_to_parent();
   }
 
   void parse_expr() throws Parse_error {
@@ -158,12 +172,14 @@ public class parse extends compiler{
   void parse_int_expr() throws Parse_error {
     if (verbose_mode) System.out.println("parse_int_expr()");
     current_tree.add_node(grammar_int_expr);
+    AST.add_node(grammar_int_expr);
     match(digit_tokens);
     if (token_stream.token.equals(addition_op_token)){
       parse_addition();
       parse_expr();
     }
     current_tree.move_up_to_parent();
+    AST.move_up_to_parent();
   }
 
   void parse_string_expr() throws Parse_error {
@@ -178,6 +194,7 @@ public class parse extends compiler{
   void parse_bool_expr() throws Parse_error {
     if (verbose_mode) System.out.println("parse_bool_expr()");
     current_tree.add_node(grammar_bool_expr);
+    AST.add_node(grammar_bool_expr);
     if (token_stream.token.equals(OPEN_PARENTHESISE_TOKEN)) {
       match(OPEN_PARENTHESISE_TOKEN);
       parse_expr();
@@ -193,6 +210,7 @@ public class parse extends compiler{
               token_stream.token);
     }
     current_tree.move_up_to_parent();
+    AST.move_up_to_parent();
   }
 
   void parse_type() throws Parse_error {
@@ -219,7 +237,7 @@ public class parse extends compiler{
   void parse_addition() throws Parse_error {
     if (verbose_mode) System.out.println("parse_addition()");
     current_tree.add_node(grammar_int_op);
-    match("ADDITION");
+    match(addition_op_token);
     current_tree.move_up_to_parent();
   }
 
@@ -233,6 +251,14 @@ public class parse extends compiler{
   void match(String token) throws Parse_error{
     if (token_stream.token.equals(token)) {
       current_tree.add_node(token_stream.token);
+      if (Arrays.asList(digit_tokens).contains(token_stream.token) ||
+              Arrays.asList(ID_tokens).contains(token_stream.token) ||
+              Arrays.asList(type_token).contains(token_stream.token) ||
+              Arrays.asList(bool_vals).contains(token_stream.token) ||
+              equality_token.equals(token_stream.token) || inequality_token.equals(token_stream.token)) {
+        AST.add_node(token_stream.token);
+        AST.move_up_to_parent();
+      }
       token_stream = token_stream.next_token;
       current_tree.move_up_to_parent();
     } else {
@@ -246,6 +272,14 @@ public class parse extends compiler{
   void match(String[] tokens) throws Parse_error {
     for (String t : tokens){
       if (t.equals(token_stream.token)){
+        if (Arrays.asList(digit_tokens).contains(token_stream.token) ||
+                Arrays.asList(ID_tokens).contains(token_stream.token) ||
+                Arrays.asList(type_token).contains(token_stream.token) ||
+                Arrays.asList(bool_vals).contains(token_stream.token) ||
+                equality_token.equals(token_stream.token) || inequality_token.equals(token_stream.token)) {
+          AST.add_node(token_stream.token);
+          AST.move_up_to_parent();
+        }
         current_tree.add_node(token_stream.token);
         token_stream = token_stream.next_token;
         current_tree.move_up_to_parent();

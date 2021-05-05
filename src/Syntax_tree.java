@@ -28,8 +28,8 @@ public class Syntax_tree {
     }
   }
 
-  void print_tree(){
-    System.out.println("CST");
+  void print_tree(String name){
+    System.out.println(name);
     root.print_down_tree(0);
   }
 

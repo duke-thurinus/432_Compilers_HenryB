@@ -7,6 +7,7 @@ public class compiler {
   static String type_int_token = "VARIABLE_TYPE [INT]";
   static String type_string_token = "VARIABLE_TYPE [STRING]";
   static String type_bool_token = "VARIABLE_TYPE [BOOL]";
+  static String[] type_token = {type_int_token, type_string_token, type_bool_token};
   static String open_bracket_token = "OPEN_BRACKET";
   static String close_bracket_token = "CLOSE_BRACKET";
   static String start_of_program_token = "PROGRAM START";
