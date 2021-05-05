@@ -1,4 +1,4 @@
-public class Syntax_tree {
+public class Syntax_tree extends compiler{
   Syntax_tree_node root = null;
   Syntax_tree_node current = null;
   Syntax_tree next_tree = null;
