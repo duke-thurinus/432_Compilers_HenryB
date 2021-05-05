@@ -35,7 +35,7 @@ public class Syntax_tree extends compiler{
 
 }
 
-class Syntax_tree_node {
+class Syntax_tree_node extends compiler{
   String name;
   Syntax_tree_node parent = null;
   Syntax_tree_node[] children;
