@@ -5,14 +5,14 @@ public class parse extends compiler{
   Syntax_tree trees;
   Syntax_tree current_tree;
   boolean verbose_mode;
-  Syntax_tree AST;
+  AST_tree AST;
 
 
   void parser(Token_stream token_stream, boolean verbose_mode){
     System.out.println(); // Just for spacing output
     this.verbose_mode = verbose_mode;
     this.token_stream = token_stream;
-    AST = new Syntax_tree();
+    AST = new AST_tree();
     while (this.token_stream != null && this.token_stream.token.equals(start_of_program_token)){
       if (trees != null){ //not the first program
         trees.next_tree = new Syntax_tree();
