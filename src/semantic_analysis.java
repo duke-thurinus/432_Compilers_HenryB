@@ -37,6 +37,7 @@ class AST_tree extends Syntax_tree {
           break;
         }
       }
+      current.add_to_full_children(name);
     }
   }
 
@@ -69,6 +70,14 @@ class AST_node extends Syntax_tree_node{
   int find_scope(){
     if (this.parent != null) return this.parent.map.scope;
     return 0;
+  }
+
+  void add_to_full_children(String name){
+    int old_size = this.children.length;
+    AST_node[] new_children = new AST_node[old_size*2];
+    System.arraycopy(this.children, 0, new_children, 0, this.children.length);
+    this.children = new_children;
+    this.children[old_size] = new AST_node(name, this);
   }
 
   void analyze_down_tree(int depth){
