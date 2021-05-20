@@ -258,6 +258,9 @@ public class parse extends compiler{
               equality_token.equals(token_stream.token) || inequality_token.equals(token_stream.token)) {
         AST.add_node(token_stream.token);
         AST.move_up_to_parent();
+      } else if (string_expression.equals(token_stream.token)){
+        AST.add_node(token_stream.token_description);
+        AST.move_up_to_parent();
       }
       token_stream = token_stream.next_token;
       current_tree.move_up_to_parent();
