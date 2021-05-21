@@ -15,7 +15,18 @@ class AST_tree extends Syntax_tree {
 
   void analyze_tree(String name){
     System.out.println(name);
-    root.analyze_down_tree(0);
+    try {
+      root.analyze_down_tree(0);
+    } catch (Semantic_error semantic_error) {
+      if (semantic_error.error_type.equals(UNDECLARED_ID)) {
+        System.out.println("Semantic Error: " + semantic_error.token + " on line number: " + semantic_error.line_numb + " was never declared");
+      } else if (semantic_error.error_type.contains(TYPE_MISMATCH)){
+        System.out.println("Semantic Error: Type Mismatch on line number: " + semantic_error.line_numb
+                + " - " + semantic_error.token + " wanted, " + semantic_error.error_type.substring(TYPE_MISMATCH.length()) + " received");
+      } else if (semantic_error.error_type.equals(MULTI_BOOL_ERROR)){
+        System.out.println("Multi bool error detected on line: " + semantic_error.line_numb + " only one boolean comparison at a time");
+      }
+    }
   }
 
   void print_symbol_table(String name){
@@ -88,22 +99,35 @@ class AST_node extends Syntax_tree_node{
     return this.children[old_size];
   }
 
-  void analyze_down_tree(int depth){
+  void analyze_down_tree(int depth) throws Semantic_error {
     String string = "-".repeat(Math.max(0, depth)) +
             " " +
             this.name;
     System.out.println(string);
 
     if (this.name.equals(grammar_var_decl)){
+      //check if ID has already been declared in this scope
+      if (map.containsKey(children[1].name)) throw new Semantic_error(this.line_numb, this.children[1].name, REDECLARED_ID);
+      //if not declare it
       map.put(children[1].name, new Variable_data(children[0].name));
     } else if (this.name.equals(grammar_assignment_statement)){
-
-    } else if (this.name.equals(grammar_print_statement)){
-
-    } else if (this.name.equals(grammar_while_statement)){
-
-    } else if (this.name.equals(grammar_if_statement)){
-
+      Variable_data ID = this.find_ID(children[0].name);
+      // check that ID has been declared in this or a higher scope
+      if (ID == null) throw new Semantic_error(this.line_numb, this.children[0].name, UNDECLARED_ID);
+      // make sure the right type is being set
+      if (parse.is_ID(children[1].name)){
+        String child_ID = this.find_ID(children[1].name).type;
+        if (!ID.type.equals(child_ID))
+          throw new Semantic_error(this.line_numb, ID.type, TYPE_MISMATCH + child_ID);
+      } else {
+        if (ID.type.equals(type_bool_token)) {
+          if (!parse.is_BOOL(this.children[1].name) && !grammar_bool_expr.equals(this.children[1].name)) {
+            throw new Semantic_error(this.line_numb, ID.type, TYPE_MISMATCH + this.children[1].name);
+          }
+        } else if (ID.type.equals(type_int_token) && !parse.is_DIGIT(this.children[1].name)){
+          throw new Semantic_error(this.line_numb, ID.type, TYPE_MISMATCH + this.children[1].name);
+        }
+      }
     }
 
     for (AST_node child : children) {
@@ -127,6 +151,12 @@ class AST_node extends Syntax_tree_node{
       }
     }
   }
+
+  Variable_data find_ID(String ID_name){
+    Variable_data ID = map.get(ID_name);
+    if (ID == null && this.parent != null) ID = this.parent.find_ID(ID_name);
+    return ID;
+  }
 }
 
 class Variable_data {
@@ -147,5 +177,17 @@ class Symbol_table extends HashMap<String, Variable_data>{
   Symbol_table(int scope){
     super();
     this.scope = scope;
+  }
+}
+
+class Semantic_error extends Exception {
+  int line_numb;
+  String token;
+  String error_type;
+
+  public Semantic_error(int line_numb, String token, String error_type) {
+    this.line_numb = line_numb;
+    this.token = token;
+    this.error_type = error_type;
   }
 }

@@ -183,6 +183,7 @@ public class parse extends compiler{
   void parse_string_expr() throws Parse_error {
     if (verbose_mode) System.out.println("parse_string_expr()");
     current_tree.add_node(grammar_string_expr);
+    AST.add_node(type_string_token, token_stream.line_numb);
     match(quote_mark_token);
     parse_char_list();
     match(quote_mark_token);
@@ -193,11 +194,13 @@ public class parse extends compiler{
     if (verbose_mode) System.out.println("parse_bool_expr()");
     current_tree.add_node(grammar_bool_expr);
     if (token_stream.token.equals(OPEN_PARENTHESISE_TOKEN)) {
+      AST.add_node(grammar_bool_expr, token_stream.line_numb);
       match(OPEN_PARENTHESISE_TOKEN);
       parse_expr();
       parse_bool_op();
       parse_expr();
       match(CLOSED_PARENTHESISE_TOKEN);
+      AST.move_up_to_parent();
     } else if (token_stream.token.equals(bool_vals[0]) || token_stream.token.equals(bool_vals[1])){
       parse_bool_val();
     } else {

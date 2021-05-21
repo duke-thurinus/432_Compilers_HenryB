@@ -52,6 +52,12 @@ public class compiler {
   static String grammar_bool_val = "BOOL VAL";
   static String grammar_int_op = "INT OP";
 
+  //errors
+  static String UNDECLARED_ID = "UNDECLARED_ID";
+  static String REDECLARED_ID = "REDECLARED_ID";
+  static String TYPE_MISMATCH = "TYPE_MISMATCH";
+  static String MULTI_BOOL_ERROR = "MULTI_BOOL_ERROR";
+
   public static void main(String[] args) {
     Char_stream char_stream = new Char_stream(System.in);
     parse p = new parse();
