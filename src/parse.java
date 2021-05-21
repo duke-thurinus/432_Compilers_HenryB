@@ -27,6 +27,7 @@ public class parse extends compiler{
       try {
         parse_program();
         this.current_tree.print_tree("CST");
+        semantic_analysis.analysis(AST, verbose_mode);
       } catch (Parse_error e){
         System.out.println("Parse Error at line: " + e.line_numb + " pos: " + e.line_pos +
                 " found: " + e.token + " could have accepted " + Arrays.toString(e.expected_tokens));
@@ -35,7 +36,6 @@ public class parse extends compiler{
         }
       }
     }
-    semantic_analysis.analysis(AST, verbose_mode);
   }
 
   void parse_program() throws Parse_error {
@@ -49,7 +49,7 @@ public class parse extends compiler{
   void parse_block() throws Parse_error {
     if (verbose_mode) System.out.println("parse_block()");
     current_tree.add_node(grammar_block);
-    AST.add_node(grammar_block);
+    AST.add_node(grammar_block, token_stream.line_numb);
     match(open_bracket_token);
     parse_statement_list();
     match(close_bracket_token);
@@ -98,7 +98,7 @@ public class parse extends compiler{
   void parse_print_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_print_statement()");
     current_tree.add_node(grammar_print_statement);
-    AST.add_node(grammar_print_statement);
+    AST.add_node(grammar_print_statement, token_stream.line_numb);
     match(print_token);
     match(OPEN_PARENTHESISE_TOKEN);
     parse_expr();
@@ -109,7 +109,7 @@ public class parse extends compiler{
   void parse_assignment_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_assignment_statement()");
     current_tree.add_node(grammar_assignment_statement);
-    AST.add_node(grammar_assignment_statement);
+    AST.add_node(grammar_assignment_statement, token_stream.line_numb);
     match(ID_tokens);
     match(assignment_token);
     parse_expr();
@@ -120,7 +120,7 @@ public class parse extends compiler{
   void parse_var_decl() throws Parse_error {
     if (verbose_mode) System.out.println("parse_var_decl()");
     current_tree.add_node(grammar_var_decl);
-    AST.add_node(grammar_var_decl);
+    AST.add_node(grammar_var_decl, token_stream.line_numb);
     parse_type();
     match(ID_tokens);
     current_tree.move_up_to_parent();
@@ -130,7 +130,7 @@ public class parse extends compiler{
   void parse_while_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_while_statement()");
     current_tree.add_node(grammar_while_statement);
-    AST.add_node(grammar_while_statement);
+    AST.add_node(grammar_while_statement, token_stream.line_numb);
     match(while_token);
     parse_bool_expr();
     parse_block();
@@ -141,7 +141,7 @@ public class parse extends compiler{
   void parse_if_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_if_statement()");
     current_tree.add_node(grammar_if_statement);
-    AST.add_node(grammar_if_statement);
+    AST.add_node(grammar_if_statement, token_stream.line_numb);
     match(if_token);
     parse_bool_expr();
     parse_block();
@@ -254,10 +254,10 @@ public class parse extends compiler{
               equality_token.equals(token_stream.token) ||
               inequality_token.equals(token_stream.token) ||
               addition_op_token.equals(token_stream.token)) {
-        AST.add_node(token_stream.token);
+        AST.add_node(token_stream.token, token_stream.line_numb);
         AST.move_up_to_parent();
       } else if (string_expression.equals(token_stream.token)){
-        AST.add_node(token_stream.token_description);
+        AST.add_node(token_stream.token_description, token_stream.line_numb);
         AST.move_up_to_parent();
       }
       token_stream = token_stream.next_token;
@@ -278,7 +278,7 @@ public class parse extends compiler{
                 Arrays.asList(type_token).contains(token_stream.token) ||
                 Arrays.asList(bool_vals).contains(token_stream.token) ||
                 equality_token.equals(token_stream.token) || inequality_token.equals(token_stream.token)) {
-          AST.add_node(token_stream.token);
+          AST.add_node(token_stream.token, token_stream.line_numb);
           AST.move_up_to_parent();
         }
         current_tree.add_node(token_stream.token);
