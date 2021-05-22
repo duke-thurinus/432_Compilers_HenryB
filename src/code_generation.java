@@ -1,8 +1,15 @@
 public class code_generation extends compiler{
   static void generate_code(AST_tree AST){
     Program program = new Program(AST);
-
+    AST.current = AST.root;
     program.print_code_hex();
+  }
+  static void generate_code_for_layer(AST_node cur_node){
+    for (AST_node node : cur_node.children) {
+      if (node.name.equals(grammar_block)){
+        code_generation.generate_code_for_layer(node);
+      }
+    }
   }
 }
 
