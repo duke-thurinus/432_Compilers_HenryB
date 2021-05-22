@@ -5,7 +5,6 @@ public class semantic_analysis extends compiler {
   static void analysis(AST_tree AST, boolean verbose_mode) {
     System.out.println();
     AST.analyze_tree("AST");
-    AST.print_symbol_table("Symbol Table");
   }
 }
 
@@ -17,6 +16,8 @@ class AST_tree extends Syntax_tree {
     System.out.println(name);
     try {
       root.analyze_down_tree(0);
+      this.print_symbol_table("Symbol Table");
+      code_generation.generate_code(this);
     } catch (Semantic_error semantic_error) {
       if (semantic_error.error_type.equals(UNDECLARED_ID)) {
         System.out.println("Semantic Error: " + semantic_error.token + " on line number: " + semantic_error.line_numb + " was never declared");
