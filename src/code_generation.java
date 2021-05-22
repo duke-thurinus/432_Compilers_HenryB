@@ -6,7 +6,11 @@ public class code_generation extends compiler{
     Program program = new Program(AST);
     generate_code_for_layer(AST.root, program);
     back_patch(program);
-    program.print_code_hex();
+    if (program.code_stack_pos > program.heap_pos + 1){
+      System.out.println("Code Generation Error: Program has exceeded the " + Program.MAX_CODE_SIZE + " byte size limit");
+    } else {
+      program.print_code_hex();
+    }
   }
   static void generate_code_for_layer(AST_node cur_node, Program program){
     for (AST_node node : cur_node.children) {
