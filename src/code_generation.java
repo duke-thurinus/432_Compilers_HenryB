@@ -5,6 +5,7 @@ public class code_generation extends compiler{
   static void generate_code(AST_tree AST){
     Program program = new Program(AST);
     generate_code_for_layer(AST.root, program);
+    back_patch(program);
     program.print_code_hex();
   }
   static void generate_code_for_layer(AST_node cur_node, Program program){
@@ -21,6 +22,21 @@ public class code_generation extends compiler{
     program.add_instruction((short) 0x00);
   }
 
+  static void back_patch(Program program){
+    int end_of_code = program.code_stack_pos;
+    for (Temp_data data : program.back_patch_data) {
+      data.address = (short) program.code_stack_pos;
+      program.code_stack_pos++;
+    }
+    for (int i = 0; i < program.code_stack_pos; i++) {
+      if (program.code[i] > 0xFF){
+        for (Temp_data data: program.back_patch_data){
+          if (program.code[i] == data.name) program.code[i] = data.address;
+        }
+      }
+    }
+  }
+
   static void var_decl(AST_node node, Program program){
     program.add_instruction(LOAD_ACCUMULATOR_CONSTANT);
     program.add_instruction((short) 0x00);// initialize variables to zero
@@ -33,7 +49,7 @@ public class code_generation extends compiler{
 class Program{
   final static int MAX_CODE_SIZE = 256;
   short[] code = new short[MAX_CODE_SIZE];
-  int code_pos = 0;
+  int code_stack_pos = 0;
   int heap_pos = MAX_CODE_SIZE - 1;
   Temp_data[] back_patch_data;
   int back_patch_count = 0;
@@ -43,8 +59,8 @@ class Program{
   }
 
   void add_instruction(short instruction){
-    code[code_pos] = instruction;
-    code_pos++;
+    code[code_stack_pos] = instruction;
+    code_stack_pos++;
   }
 
   short new_temp_data(String var, int scope){
@@ -65,10 +81,14 @@ class Program{
   void print_code_hex(){
     System.out.println();
     int counter = 0;
+    int line_num = 0;
+    System.out.print(String.format("%02x", line_num) + " : ");
     for (short byt: code) {
       if (counter >= 8){
         System.out.println();
         counter = 0;
+        line_num += 8;
+        System.out.print(String.format("%02x", line_num) + " : ");
       }
       System.out.print(String.format("%02x", byt) + " ");
       counter++;
@@ -81,7 +101,7 @@ class Temp_data{
   short name;
   String var;
   int scope;
-  int offset;
+  short address;
 
   Temp_data(String var, int scope) {
     this.name = next_new_temp;
