@@ -1,62 +1,62 @@
 
 public class compiler {
-  static String COMMENT_START_TOKEN = "COMMENT_START";
-  static String print_token = "PRINT";
-  static String while_token = "WHILE";
-  static String if_token = "IF";
-  static String type_int_token = "VARIABLE_TYPE [INT]";
-  static String type_string_token = "VARIABLE_TYPE [STRING]";
-  static String type_bool_token = "VARIABLE_TYPE [BOOL]";
-  static String[] type_token = {type_int_token, type_string_token, type_bool_token};
-  static String open_bracket_token = "OPEN_BRACKET";
-  static String close_bracket_token = "CLOSE_BRACKET";
-  static String start_of_program_token = "PROGRAM START";
-  static String END_OF_PROGRAM_TOKEN = "END_OF_PROGRAM";
-  static String OPEN_PARENTHESISE_TOKEN = "OPEN_PARENTHESISE";
-  static String CLOSED_PARENTHESISE_TOKEN = "CLOSED_PARENTHESISE";
-  static String assignment_token = "ASSIGNMENT_OP";
-  static String equality_token = "EQUALITY_OP";
-  static String inequality_token = "INEQUALITY_OP";
-  static String addition_op_token = "ADDITION";
-  static String quote_mark_token = "QUOTE_MARK";
-  static String string_expression = "STRING_EXPRESSION";
-  static String[] digit_tokens = {"DIGIT [0]", "DIGIT [1]", "DIGIT [2]", "DIGIT [3]", "DIGIT [4]"
+  final static String COMMENT_START_TOKEN = "COMMENT_START";
+  final static String PRINT_TOKEN = "PRINT";
+  final static String WHILE_TOKEN = "WHILE";
+  final static String IF_TOKEN = "IF";
+  final static String TYPE_INT_TOKEN = "VARIABLE_TYPE [INT]";
+  final static String TYPE_STRING_TOKEN = "VARIABLE_TYPE [STRING]";
+  final static String TYPE_BOOL_TOKEN = "VARIABLE_TYPE [BOOL]";
+  final static String[] TYPE_TOKEN = {TYPE_INT_TOKEN, TYPE_STRING_TOKEN, TYPE_BOOL_TOKEN};
+  final static String OPEN_BRACKET_TOKEN = "OPEN_BRACKET";
+  final static String CLOSE_BRACKET_TOKEN = "CLOSE_BRACKET";
+  final static String START_OF_PROGRAM_TOKEN = "PROGRAM START";
+  final static String END_OF_PROGRAM_TOKEN = "END_OF_PROGRAM";
+  final static String OPEN_PARENTHESISE_TOKEN = "OPEN_PARENTHESISE";
+  final static String CLOSED_PARENTHESISE_TOKEN = "CLOSED_PARENTHESISE";
+  final static String ASSIGNMENT_TOKEN = "ASSIGNMENT_OP";
+  final static String EQUALITY_TOKEN = "EQUALITY_OP";
+  final static String INEQUALITY_TOKEN = "INEQUALITY_OP";
+  final static String ADDITION_OP_TOKEN = "ADDITION";
+  final static String QUOTE_MARK_TOKEN = "QUOTE_MARK";
+  final static String STRING_EXPRESSION = "STRING_EXPRESSION";
+  final static String[] DIGIT_TOKENS = {"DIGIT [0]", "DIGIT [1]", "DIGIT [2]", "DIGIT [3]", "DIGIT [4]"
           , "DIGIT [5]", "DIGIT [6]", "DIGIT [7]", "DIGIT [8]", "DIGIT [9]"};
-  static String digit_token = "DIGIT TOKEN"; // For error handling
-  static String[] ID_tokens = {"ID [a]", "ID [b]", "ID [c]", "ID [d]", "ID [e]", "ID [f]", "ID [g]", "ID [h]"
+  final static String DIGIT_TOKEN = "DIGIT TOKEN"; // For error handling
+  final static String[] ID_TOKENS = {"ID [a]", "ID [b]", "ID [c]", "ID [d]", "ID [e]", "ID [f]", "ID [g]", "ID [h]"
           , "ID [i]", "ID [j]", "ID [k]", "ID [l]", "ID [m]", "ID [n]", "ID [o]", "ID [p]", "ID [q]", "ID [r]"
           , "ID [s]", "ID [t]", "ID [u]", "ID [v]", "ID [w]", "ID [x]", "ID [y]", "ID [z]"};
-  static String ID_token = "ID TOKEN"; // For error handling
-  static String[] bool_vals = {"BOOL_VAL [FALSE]", "BOOL_VAL [TRUE]"};
-  static String bool_val_token = "BOOL VAL TOKEN"; // For error handling
+  final static String ID_TOKEN = "ID TOKEN"; // For error handling
+  final static String[] BOOL_VALS = {"BOOL_VAL [FALSE]", "BOOL_VAL [TRUE]"};
+  final static String BOOL_VAL_TOKEN = "BOOL VAL TOKEN"; // For error handling
 
   // grammar
-  static String grammar_program = "PROGRAM";
-  static String grammar_block = "BLOCK";
-  static String grammar_statement_list = "STATEMENT LIST";
-  static String grammar_statement = "STATEMENT";
-  static String grammar_print_statement = "PRINT STATEMENT";
-  static String grammar_assignment_statement = "ASSIGNMENT STATEMENT";
-  static String grammar_var_decl = "VAR DECL";
-  static String grammar_while_statement = "WHILE STATEMENT";
-  static String grammar_if_statement = "IF STATEMENT";
-  static String grammar_expr = "EXPR";
-  static String grammar_int_expr = "INT EXPR";
-  static String grammar_string_expr = "STRING EXPR";
-  static String grammar_bool_expr = "BOOL EXPR";
-  static String[] grammar_id = ID_tokens;
-  static String grammar_char_list = "CHAR LIST";
-  static String grammar_type = "TYPE";
-  static String[] grammar_digits = digit_tokens;
-  static String grammar_bool_op = "BOOL OP";
-  static String grammar_bool_val = "BOOL VAL";
-  static String grammar_int_op = "INT OP";
+  final static String GRAMMAR_PROGRAM = "PROGRAM";
+  final static String GRAMMAR_BLOCK = "BLOCK";
+  final static String GRAMMAR_STATEMENT_LIST = "STATEMENT LIST";
+  final static String GRAMMAR_STATEMENT = "STATEMENT";
+  final static String GRAMMAR_PRINT_STATEMENT = "PRINT STATEMENT";
+  final static String GRAMMAR_ASSIGNMENT_STATEMENT = "ASSIGNMENT STATEMENT";
+  final static String GRAMMAR_VAR_DECL = "VAR DECL";
+  final static String GRAMMAR_WHILE_STATEMENT = "WHILE STATEMENT";
+  final static String GRAMMAR_IF_STATEMENT = "IF STATEMENT";
+  final static String GRAMMAR_EXPR = "EXPR";
+  final static String GRAMMAR_INT_EXPR = "INT EXPR";
+  final static String GRAMMAR_STRING_EXPR = "STRING EXPR";
+  final static String GRAMMAR_BOOL_EXPR = "BOOL EXPR";
+  final static String[] grammar_id = ID_TOKENS;
+  final static String GRAMMAR_CHAR_LIST = "CHAR LIST";
+  final static String GRAMMAR_TYPE = "TYPE";
+  final static String[] grammar_digits = DIGIT_TOKENS;
+  final static String GRAMMAR_BOOL_OP = "BOOL OP";
+  final static String GRAMMAR_BOOL_VAL = "BOOL VAL";
+  final static String GRAMMAR_INT_OP = "INT OP";
 
   //errors
-  static String UNDECLARED_ID = "UNDECLARED_ID";
-  static String REDECLARED_ID = "REDECLARED_ID";
-  static String TYPE_MISMATCH = "TYPE_MISMATCH";
-  static String MULTI_BOOL_ERROR = "MULTI_BOOL_ERROR";
+  final static String UNDECLARED_ID = "UNDECLARED_ID";
+  final static String REDECLARED_ID = "REDECLARED_ID";
+  final static String TYPE_MISMATCH = "TYPE_MISMATCH";
+  final static String MULTI_BOOL_ERROR = "MULTI_BOOL_ERROR";
 
   public static void main(String[] args) {
     Char_stream char_stream = new Char_stream(System.in);

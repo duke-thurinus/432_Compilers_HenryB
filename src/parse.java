@@ -13,7 +13,7 @@ public class parse extends compiler{
     this.verbose_mode = verbose_mode;
     this.token_stream = token_stream;
     AST = new AST_tree();
-    while (this.token_stream != null && this.token_stream.token.equals(start_of_program_token)){
+    while (this.token_stream != null && this.token_stream.token.equals(START_OF_PROGRAM_TOKEN)){
       if (trees != null){ //not the first program
         trees.next_tree = new Syntax_tree();
         current_tree = trees.next_tree;
@@ -31,7 +31,7 @@ public class parse extends compiler{
       } catch (Parse_error e){
         System.out.println("Parse Error at line: " + e.line_numb + " pos: " + e.line_pos +
                 " found: " + e.token + " could have accepted " + Arrays.toString(e.expected_tokens));
-        while (this.token_stream.next_token != null && !this.token_stream.token.equals(start_of_program_token)){
+        while (this.token_stream.next_token != null && !this.token_stream.token.equals(START_OF_PROGRAM_TOKEN)){
           this.token_stream = this.token_stream.next_token;
         }
       }
@@ -40,7 +40,7 @@ public class parse extends compiler{
 
   void parse_program() throws Parse_error {
     if (verbose_mode) System.out.println("parse_program()");
-    current_tree.add_node(grammar_program);
+    current_tree.add_node(GRAMMAR_PROGRAM);
     parse_block();
     match(END_OF_PROGRAM_TOKEN);
     current_tree.move_up_to_parent();
@@ -48,19 +48,19 @@ public class parse extends compiler{
 
   void parse_block() throws Parse_error {
     if (verbose_mode) System.out.println("parse_block()");
-    current_tree.add_node(grammar_block);
-    AST.add_node(grammar_block, token_stream.line_numb);
-    match(open_bracket_token);
+    current_tree.add_node(GRAMMAR_BLOCK);
+    AST.add_node(GRAMMAR_BLOCK, token_stream.line_numb);
+    match(OPEN_BRACKET_TOKEN);
     parse_statement_list();
-    match(close_bracket_token);
+    match(CLOSE_BRACKET_TOKEN);
     current_tree.move_up_to_parent();
     AST.move_up_to_parent();
   }
 
   void parse_statement_list() throws Parse_error {
     if (verbose_mode) System.out.println("parse_statement_list()");
-    current_tree.add_node(grammar_statement_list);
-    if (!token_stream.token.equals(close_bracket_token)) {
+    current_tree.add_node(GRAMMAR_STATEMENT_LIST);
+    if (!token_stream.token.equals(CLOSE_BRACKET_TOKEN)) {
       parse_statement();
       parse_statement_list();
     } else {
@@ -71,25 +71,25 @@ public class parse extends compiler{
 
   void parse_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_statement()");
-    current_tree.add_node(grammar_statement);
-    if (token_stream.token.equals(print_token)) {
+    current_tree.add_node(GRAMMAR_STATEMENT);
+    if (token_stream.token.equals(PRINT_TOKEN)) {
       parse_print_statement();
     } else if (is_ID(token_stream.token)) {
       parse_assignment_statement();
-    } else if (token_stream.token.equals(type_int_token) ||
-            token_stream.token.equals(type_bool_token) ||
-            token_stream.token.equals(type_string_token)) {
+    } else if (token_stream.token.equals(TYPE_INT_TOKEN) ||
+            token_stream.token.equals(TYPE_BOOL_TOKEN) ||
+            token_stream.token.equals(TYPE_STRING_TOKEN)) {
       parse_var_decl();
-    } else if (token_stream.token.equals(while_token)) {
+    } else if (token_stream.token.equals(WHILE_TOKEN)) {
       parse_while_statement();
-    } else if (token_stream.token.equals(if_token)) {
+    } else if (token_stream.token.equals(IF_TOKEN)) {
       parse_if_statement();
-    } else if (token_stream.token.equals(open_bracket_token)) {
+    } else if (token_stream.token.equals(OPEN_BRACKET_TOKEN)) {
       parse_block();
     } else {
       // ERROR
       throw new Parse_error(token_stream.line_numb, token_stream.line_pos,
-              new String[]{print_token, ID_token, type_int_token, type_bool_token, type_string_token, while_token, if_token, open_bracket_token},
+              new String[]{PRINT_TOKEN, ID_TOKEN, TYPE_INT_TOKEN, TYPE_BOOL_TOKEN, TYPE_STRING_TOKEN, WHILE_TOKEN, IF_TOKEN, OPEN_BRACKET_TOKEN},
               token_stream.token);
     }
     current_tree.move_up_to_parent();
@@ -97,9 +97,9 @@ public class parse extends compiler{
 
   void parse_print_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_print_statement()");
-    current_tree.add_node(grammar_print_statement);
-    AST.add_node(grammar_print_statement, token_stream.line_numb);
-    match(print_token);
+    current_tree.add_node(GRAMMAR_PRINT_STATEMENT);
+    AST.add_node(GRAMMAR_PRINT_STATEMENT, token_stream.line_numb);
+    match(PRINT_TOKEN);
     match(OPEN_PARENTHESISE_TOKEN);
     parse_expr();
     match(CLOSED_PARENTHESISE_TOKEN);
@@ -108,10 +108,10 @@ public class parse extends compiler{
 
   void parse_assignment_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_assignment_statement()");
-    current_tree.add_node(grammar_assignment_statement);
-    AST.add_node(grammar_assignment_statement, token_stream.line_numb);
-    match(ID_tokens);
-    match(assignment_token);
+    current_tree.add_node(GRAMMAR_ASSIGNMENT_STATEMENT);
+    AST.add_node(GRAMMAR_ASSIGNMENT_STATEMENT, token_stream.line_numb);
+    match(ID_TOKENS);
+    match(ASSIGNMENT_TOKEN);
     parse_expr();
     current_tree.move_up_to_parent();
     AST.move_up_to_parent();
@@ -119,19 +119,19 @@ public class parse extends compiler{
 
   void parse_var_decl() throws Parse_error {
     if (verbose_mode) System.out.println("parse_var_decl()");
-    current_tree.add_node(grammar_var_decl);
-    AST.add_node(grammar_var_decl, token_stream.line_numb);
+    current_tree.add_node(GRAMMAR_VAR_DECL);
+    AST.add_node(GRAMMAR_VAR_DECL, token_stream.line_numb);
     parse_type();
-    match(ID_tokens);
+    match(ID_TOKENS);
     current_tree.move_up_to_parent();
     AST.move_up_to_parent();
   }
 
   void parse_while_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_while_statement()");
-    current_tree.add_node(grammar_while_statement);
-    AST.add_node(grammar_while_statement, token_stream.line_numb);
-    match(while_token);
+    current_tree.add_node(GRAMMAR_WHILE_STATEMENT);
+    AST.add_node(GRAMMAR_WHILE_STATEMENT, token_stream.line_numb);
+    match(WHILE_TOKEN);
     parse_bool_expr();
     parse_block();
     current_tree.move_up_to_parent();
@@ -140,9 +140,9 @@ public class parse extends compiler{
 
   void parse_if_statement() throws Parse_error {
     if (verbose_mode) System.out.println("parse_if_statement()");
-    current_tree.add_node(grammar_if_statement);
-    AST.add_node(grammar_if_statement, token_stream.line_numb);
-    match(if_token);
+    current_tree.add_node(GRAMMAR_IF_STATEMENT);
+    AST.add_node(GRAMMAR_IF_STATEMENT, token_stream.line_numb);
+    match(IF_TOKEN);
     parse_bool_expr();
     parse_block();
     current_tree.move_up_to_parent();
@@ -151,19 +151,19 @@ public class parse extends compiler{
 
   void parse_expr() throws Parse_error {
     if (verbose_mode) System.out.println("parse_expr()");
-    current_tree.add_node(grammar_expr);
+    current_tree.add_node(GRAMMAR_EXPR);
     if (is_DIGIT(token_stream.token)){
       parse_int_expr();
-    } else if (token_stream.token.equals(quote_mark_token)){
+    } else if (token_stream.token.equals(QUOTE_MARK_TOKEN)){
       parse_string_expr();
     } else if (token_stream.token.equals(OPEN_PARENTHESISE_TOKEN) || is_BOOL(token_stream.token)){
       parse_bool_expr();
     } else if (is_ID(token_stream.token)){
-      match(ID_tokens);
+      match(ID_TOKENS);
     } else {
       // ERROR
       throw new Parse_error(token_stream.line_numb, token_stream.line_pos,
-              new String[]{digit_token, quote_mark_token, type_bool_token, type_int_token},
+              new String[]{DIGIT_TOKEN, QUOTE_MARK_TOKEN, TYPE_BOOL_TOKEN, TYPE_INT_TOKEN},
               token_stream.token);
     }
     current_tree.move_up_to_parent();
@@ -171,9 +171,9 @@ public class parse extends compiler{
 
   void parse_int_expr() throws Parse_error {
     if (verbose_mode) System.out.println("parse_int_expr()");
-    current_tree.add_node(grammar_int_expr);
-    match(digit_tokens);
-    if (token_stream.token.equals(addition_op_token)){
+    current_tree.add_node(GRAMMAR_INT_EXPR);
+    match(DIGIT_TOKENS);
+    if (token_stream.token.equals(ADDITION_OP_TOKEN)){
       parse_addition();
       parse_expr();
     }
@@ -182,31 +182,31 @@ public class parse extends compiler{
 
   void parse_string_expr() throws Parse_error {
     if (verbose_mode) System.out.println("parse_string_expr()");
-    current_tree.add_node(grammar_string_expr);
-    AST.add_node(type_string_token, token_stream.line_numb);
-    match(quote_mark_token);
+    current_tree.add_node(GRAMMAR_STRING_EXPR);
+    AST.add_node(TYPE_STRING_TOKEN, token_stream.line_numb);
+    match(QUOTE_MARK_TOKEN);
     parse_char_list();
-    match(quote_mark_token);
+    match(QUOTE_MARK_TOKEN);
     current_tree.move_up_to_parent();
   }
 
   void parse_bool_expr() throws Parse_error {
     if (verbose_mode) System.out.println("parse_bool_expr()");
-    current_tree.add_node(grammar_bool_expr);
+    current_tree.add_node(GRAMMAR_BOOL_EXPR);
     if (token_stream.token.equals(OPEN_PARENTHESISE_TOKEN)) {
-      AST.add_node(grammar_bool_expr, token_stream.line_numb);
+      AST.add_node(GRAMMAR_BOOL_EXPR, token_stream.line_numb);
       match(OPEN_PARENTHESISE_TOKEN);
       parse_expr();
       parse_bool_op();
       parse_expr();
       match(CLOSED_PARENTHESISE_TOKEN);
       AST.move_up_to_parent();
-    } else if (token_stream.token.equals(bool_vals[0]) || token_stream.token.equals(bool_vals[1])){
+    } else if (token_stream.token.equals(BOOL_VALS[0]) || token_stream.token.equals(BOOL_VALS[1])){
       parse_bool_val();
     } else {
       // ERROR
       throw new Parse_error(token_stream.line_numb, token_stream.line_pos,
-              new String[]{OPEN_PARENTHESISE_TOKEN, bool_val_token},
+              new String[]{OPEN_PARENTHESISE_TOKEN, BOOL_VAL_TOKEN},
               token_stream.token);
     }
     current_tree.move_up_to_parent();
@@ -214,52 +214,52 @@ public class parse extends compiler{
 
   void parse_type() throws Parse_error {
     if (verbose_mode) System.out.println("parse_type()");
-    current_tree.add_node(grammar_type);
-    match(new String[]{type_int_token, type_string_token, type_bool_token});
+    current_tree.add_node(GRAMMAR_TYPE);
+    match(new String[]{TYPE_INT_TOKEN, TYPE_STRING_TOKEN, TYPE_BOOL_TOKEN});
     current_tree.move_up_to_parent();
   }
 
   void parse_bool_op() throws Parse_error {
     if (verbose_mode) System.out.println("parse_bool_op()");
-    current_tree.add_node(grammar_bool_op);
-    match(new String[]{equality_token, inequality_token});
+    current_tree.add_node(GRAMMAR_BOOL_OP);
+    match(new String[]{EQUALITY_TOKEN, INEQUALITY_TOKEN});
     current_tree.move_up_to_parent();
   }
 
   void parse_bool_val() throws Parse_error {
     if (verbose_mode) System.out.println("parse_bool_val()");
-    current_tree.add_node(grammar_bool_val);
-    match(bool_vals);
+    current_tree.add_node(GRAMMAR_BOOL_VAL);
+    match(BOOL_VALS);
     current_tree.move_up_to_parent();
   }
 
   void parse_addition() throws Parse_error {
     if (verbose_mode) System.out.println("parse_addition()");
-    current_tree.add_node(grammar_int_op);
-    match(addition_op_token);
+    current_tree.add_node(GRAMMAR_INT_OP);
+    match(ADDITION_OP_TOKEN);
     current_tree.move_up_to_parent();
   }
 
   void parse_char_list() throws Parse_error {
     if (verbose_mode) System.out.println("parse_char_list()");
-    current_tree.add_node(grammar_char_list);
-    match(string_expression);
+    current_tree.add_node(GRAMMAR_CHAR_LIST);
+    match(STRING_EXPRESSION);
     current_tree.move_up_to_parent();
   }
 
   void match(String token) throws Parse_error{
     if (token_stream.token.equals(token)) {
       current_tree.add_node(token_stream.token);
-      if (Arrays.asList(digit_tokens).contains(token_stream.token) ||
-              Arrays.asList(ID_tokens).contains(token_stream.token) ||
-              Arrays.asList(type_token).contains(token_stream.token) ||
-              Arrays.asList(bool_vals).contains(token_stream.token) ||
-              equality_token.equals(token_stream.token) ||
-              inequality_token.equals(token_stream.token) ||
-              addition_op_token.equals(token_stream.token)) {
+      if (Arrays.asList(DIGIT_TOKENS).contains(token_stream.token) ||
+              Arrays.asList(ID_TOKENS).contains(token_stream.token) ||
+              Arrays.asList(TYPE_TOKEN).contains(token_stream.token) ||
+              Arrays.asList(BOOL_VALS).contains(token_stream.token) ||
+              EQUALITY_TOKEN.equals(token_stream.token) ||
+              INEQUALITY_TOKEN.equals(token_stream.token) ||
+              ADDITION_OP_TOKEN.equals(token_stream.token)) {
         AST.add_node(token_stream.token, token_stream.line_numb);
         AST.move_up_to_parent();
-      } else if (string_expression.equals(token_stream.token)){
+      } else if (STRING_EXPRESSION.equals(token_stream.token)){
         AST.add_node(token_stream.token_description, token_stream.line_numb);
         AST.move_up_to_parent();
       }
@@ -276,11 +276,11 @@ public class parse extends compiler{
   void match(String[] tokens) throws Parse_error {
     for (String t : tokens){
       if (t.equals(token_stream.token)){
-        if (Arrays.asList(digit_tokens).contains(token_stream.token) ||
-                Arrays.asList(ID_tokens).contains(token_stream.token) ||
-                Arrays.asList(type_token).contains(token_stream.token) ||
-                Arrays.asList(bool_vals).contains(token_stream.token) ||
-                equality_token.equals(token_stream.token) || inequality_token.equals(token_stream.token)) {
+        if (Arrays.asList(DIGIT_TOKENS).contains(token_stream.token) ||
+                Arrays.asList(ID_TOKENS).contains(token_stream.token) ||
+                Arrays.asList(TYPE_TOKEN).contains(token_stream.token) ||
+                Arrays.asList(BOOL_VALS).contains(token_stream.token) ||
+                EQUALITY_TOKEN.equals(token_stream.token) || INEQUALITY_TOKEN.equals(token_stream.token)) {
           AST.add_node(token_stream.token, token_stream.line_numb);
           AST.move_up_to_parent();
         }
@@ -292,12 +292,12 @@ public class parse extends compiler{
     }
     // ERROR
     String[] desired_tokens;
-    if (tokens[0].equals(digit_tokens[0])){
-      desired_tokens = new String[] {digit_token};
-    } else if (tokens[0].equals(ID_tokens[0])){
-      desired_tokens = new String[] {ID_token};
-    } else if (tokens[0].equals(bool_vals[0])){
-      desired_tokens = new String[] {bool_val_token};
+    if (tokens[0].equals(DIGIT_TOKENS[0])){
+      desired_tokens = new String[] {DIGIT_TOKEN};
+    } else if (tokens[0].equals(ID_TOKENS[0])){
+      desired_tokens = new String[] {ID_TOKEN};
+    } else if (tokens[0].equals(BOOL_VALS[0])){
+      desired_tokens = new String[] {BOOL_VAL_TOKEN};
     } else {
       desired_tokens = tokens;
     }
@@ -317,7 +317,7 @@ public class parse extends compiler{
   }
 
   static  boolean is_BOOL(String token){
-    return (token.equals(bool_vals[0]) || token.equals(bool_vals[1]));
+    return (token.equals(BOOL_VALS[0]) || token.equals(BOOL_VALS[1]));
   }
 }
 

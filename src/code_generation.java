@@ -6,7 +6,7 @@ public class code_generation extends compiler{
   }
   static void generate_code_for_layer(AST_node cur_node){
     for (AST_node node : cur_node.children) {
-      if (node.name.equals(grammar_block)){
+      if (node.name.equals(GRAMMAR_BLOCK)){
         code_generation.generate_code_for_layer(node);
       }
     }

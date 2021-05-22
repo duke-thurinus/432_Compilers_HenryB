@@ -7,60 +7,60 @@ class lex extends compiler{
 
 
     // build graph of the language grammar
-    Graph_vertex.insert(head,"a", ID_tokens[0]);
-    Graph_vertex.insert(head,"b", ID_tokens[1]);
-    Graph_vertex.insert(head,"c", ID_tokens[2]);
-    Graph_vertex.insert(head,"d", ID_tokens[3]);
-    Graph_vertex.insert(head,"e", ID_tokens[4]);
-    Graph_vertex.insert(head,"f", ID_tokens[5]);
-    Graph_vertex.insert(head,"g", ID_tokens[6]);
-    Graph_vertex.insert(head,"h", ID_tokens[7]);
-    Graph_vertex.insert(head,"i", ID_tokens[8]);
-    Graph_vertex.insert(head,"j", ID_tokens[9]);
-    Graph_vertex.insert(head,"k", ID_tokens[10]);
-    Graph_vertex.insert(head,"l", ID_tokens[11]);
-    Graph_vertex.insert(head,"m", ID_tokens[12]);
-    Graph_vertex.insert(head,"n", ID_tokens[13]);
-    Graph_vertex.insert(head,"o", ID_tokens[14]);
-    Graph_vertex.insert(head,"p", ID_tokens[15]);
-    Graph_vertex.insert(head,"q", ID_tokens[16]);
-    Graph_vertex.insert(head,"r", ID_tokens[17]);
-    Graph_vertex.insert(head,"s", ID_tokens[18]);
-    Graph_vertex.insert(head,"t", ID_tokens[19]);
-    Graph_vertex.insert(head,"u", ID_tokens[20]);
-    Graph_vertex.insert(head,"v", ID_tokens[21]);
-    Graph_vertex.insert(head,"w", ID_tokens[22]);
-    Graph_vertex.insert(head,"x", ID_tokens[23]);
-    Graph_vertex.insert(head,"y", ID_tokens[24]);
-    Graph_vertex.insert(head,"z", ID_tokens[25]);
-    Graph_vertex.insert(head,"0", digit_tokens[0]);
-    Graph_vertex.insert(head,"1", digit_tokens[1]);
-    Graph_vertex.insert(head,"2", digit_tokens[2]);
-    Graph_vertex.insert(head,"3", digit_tokens[3]);
-    Graph_vertex.insert(head,"4", digit_tokens[4]);
-    Graph_vertex.insert(head,"5", digit_tokens[5]);
-    Graph_vertex.insert(head,"6", digit_tokens[6]);
-    Graph_vertex.insert(head,"7", digit_tokens[7]);
-    Graph_vertex.insert(head,"8", digit_tokens[8]);
-    Graph_vertex.insert(head,"9", digit_tokens[9]);
-    Graph_vertex.insert(head,"+", addition_op_token);
-    Graph_vertex.insert(head,"==", equality_token);
-    Graph_vertex.insert(head,"!=", inequality_token);
-    Graph_vertex.insert(head,"=",assignment_token);
-    Graph_vertex.insert(head,"{", open_bracket_token);
-    Graph_vertex.insert(head,"}", close_bracket_token);
+    Graph_vertex.insert(head,"a", ID_TOKENS[0]);
+    Graph_vertex.insert(head,"b", ID_TOKENS[1]);
+    Graph_vertex.insert(head,"c", ID_TOKENS[2]);
+    Graph_vertex.insert(head,"d", ID_TOKENS[3]);
+    Graph_vertex.insert(head,"e", ID_TOKENS[4]);
+    Graph_vertex.insert(head,"f", ID_TOKENS[5]);
+    Graph_vertex.insert(head,"g", ID_TOKENS[6]);
+    Graph_vertex.insert(head,"h", ID_TOKENS[7]);
+    Graph_vertex.insert(head,"i", ID_TOKENS[8]);
+    Graph_vertex.insert(head,"j", ID_TOKENS[9]);
+    Graph_vertex.insert(head,"k", ID_TOKENS[10]);
+    Graph_vertex.insert(head,"l", ID_TOKENS[11]);
+    Graph_vertex.insert(head,"m", ID_TOKENS[12]);
+    Graph_vertex.insert(head,"n", ID_TOKENS[13]);
+    Graph_vertex.insert(head,"o", ID_TOKENS[14]);
+    Graph_vertex.insert(head,"p", ID_TOKENS[15]);
+    Graph_vertex.insert(head,"q", ID_TOKENS[16]);
+    Graph_vertex.insert(head,"r", ID_TOKENS[17]);
+    Graph_vertex.insert(head,"s", ID_TOKENS[18]);
+    Graph_vertex.insert(head,"t", ID_TOKENS[19]);
+    Graph_vertex.insert(head,"u", ID_TOKENS[20]);
+    Graph_vertex.insert(head,"v", ID_TOKENS[21]);
+    Graph_vertex.insert(head,"w", ID_TOKENS[22]);
+    Graph_vertex.insert(head,"x", ID_TOKENS[23]);
+    Graph_vertex.insert(head,"y", ID_TOKENS[24]);
+    Graph_vertex.insert(head,"z", ID_TOKENS[25]);
+    Graph_vertex.insert(head,"0", DIGIT_TOKENS[0]);
+    Graph_vertex.insert(head,"1", DIGIT_TOKENS[1]);
+    Graph_vertex.insert(head,"2", DIGIT_TOKENS[2]);
+    Graph_vertex.insert(head,"3", DIGIT_TOKENS[3]);
+    Graph_vertex.insert(head,"4", DIGIT_TOKENS[4]);
+    Graph_vertex.insert(head,"5", DIGIT_TOKENS[5]);
+    Graph_vertex.insert(head,"6", DIGIT_TOKENS[6]);
+    Graph_vertex.insert(head,"7", DIGIT_TOKENS[7]);
+    Graph_vertex.insert(head,"8", DIGIT_TOKENS[8]);
+    Graph_vertex.insert(head,"9", DIGIT_TOKENS[9]);
+    Graph_vertex.insert(head,"+", ADDITION_OP_TOKEN);
+    Graph_vertex.insert(head,"==", EQUALITY_TOKEN);
+    Graph_vertex.insert(head,"!=", INEQUALITY_TOKEN);
+    Graph_vertex.insert(head,"=", ASSIGNMENT_TOKEN);
+    Graph_vertex.insert(head,"{", OPEN_BRACKET_TOKEN);
+    Graph_vertex.insert(head,"}", CLOSE_BRACKET_TOKEN);
     Graph_vertex.insert(head,"(", OPEN_PARENTHESISE_TOKEN);
     Graph_vertex.insert(head,")", CLOSED_PARENTHESISE_TOKEN);
-    Graph_vertex.insert(head,"\"", quote_mark_token);
+    Graph_vertex.insert(head,"\"", QUOTE_MARK_TOKEN);
     Graph_vertex.insert(head,"/*", COMMENT_START_TOKEN);
-    Graph_vertex.insert(head,"print", print_token);
-    Graph_vertex.insert(head,"while", while_token);
-    Graph_vertex.insert(head,"if", if_token);
-    Graph_vertex.insert(head,"int", type_int_token);
-    Graph_vertex.insert(head,"string", type_string_token);
-    Graph_vertex.insert(head,"boolean", type_bool_token);
-    Graph_vertex.insert(head,"false", bool_vals[0]);
-    Graph_vertex.insert(head,"true", bool_vals[1]);
+    Graph_vertex.insert(head,"print", PRINT_TOKEN);
+    Graph_vertex.insert(head,"while", WHILE_TOKEN);
+    Graph_vertex.insert(head,"if", IF_TOKEN);
+    Graph_vertex.insert(head,"int", TYPE_INT_TOKEN);
+    Graph_vertex.insert(head,"string", TYPE_STRING_TOKEN);
+    Graph_vertex.insert(head,"boolean", TYPE_BOOL_TOKEN);
+    Graph_vertex.insert(head,"false", BOOL_VALS[0]);
+    Graph_vertex.insert(head,"true", BOOL_VALS[1]);
     Graph_vertex.insert(head,"$", END_OF_PROGRAM_TOKEN);
 
     Graph_vertex.valid_chars.add(' ');
@@ -158,10 +158,10 @@ class lex extends compiler{
 
 
             if (verbose_mode) {
-              System.out.print("LEXER--> " + quote_mark_token);
+              System.out.print("LEXER--> " + QUOTE_MARK_TOKEN);
               System.out.println(" at line: " + char_stream.line_numb + " position: " + char_stream.line_position);
             }
-            current_stream_pos.next_token = new Token_stream(quote_mark_token , char_stream.line_numb,char_stream.line_position);
+            current_stream_pos.next_token = new Token_stream(QUOTE_MARK_TOKEN, char_stream.line_numb,char_stream.line_position);
             current_stream_pos = current_stream_pos.next_token;
           }
           in_quotes = false;
@@ -193,7 +193,7 @@ class lex extends compiler{
                 }
                 current_stream_pos.next_token = new Token_stream(longest_match.token , next_match_line_numb, next_match_line_pos);
                 current_stream_pos = current_stream_pos.next_token;
-                in_quotes = longest_match.token.equals(quote_mark_token); // check if quote has started
+                in_quotes = longest_match.token.equals(QUOTE_MARK_TOKEN); // check if quote has started
               }
               longest_match = null;
               current_pos = head;

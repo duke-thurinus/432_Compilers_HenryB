@@ -76,7 +76,7 @@ class AST_node extends Syntax_tree_node{
     super(name);
     this.line_numb = line_numb;
     children = new AST_node[5];
-    if (name.equals(grammar_block)) map = new Symbol_table(find_scope() + 1);
+    if (name.equals(GRAMMAR_BLOCK)) map = new Symbol_table(find_scope() + 1);
   }
 
   AST_node(String name, AST_node parent, int line_numb) {
@@ -84,7 +84,7 @@ class AST_node extends Syntax_tree_node{
     this.line_numb = line_numb;
     this.parent = parent;
     children = new AST_node[5];
-    if (name.equals(grammar_block)) map = new Symbol_table(find_scope() + 1);
+    if (name.equals(GRAMMAR_BLOCK)) map = new Symbol_table(find_scope() + 1);
     else map = parent.map;
   }
 
@@ -108,12 +108,12 @@ class AST_node extends Syntax_tree_node{
             this.name;
     System.out.println(string);
 
-    if (this.name.equals(grammar_var_decl)){
+    if (this.name.equals(GRAMMAR_VAR_DECL)){
       //check if ID has already been declared in this scope
       if (map.containsKey(children[1].name)) throw new Semantic_error(this.line_numb, this.children[1].name, REDECLARED_ID);
       //if not declare it
       map.put(children[1].name, new Variable_data(children[0].name));
-    } else if (this.name.equals(grammar_assignment_statement)){
+    } else if (this.name.equals(GRAMMAR_ASSIGNMENT_STATEMENT)){
       Variable_data ID = this.find_ID(children[0].name);
       // check that ID has been declared in this or a higher scope
       if (ID == null) throw new Semantic_error(this.line_numb, this.children[0].name, UNDECLARED_ID);
@@ -123,11 +123,11 @@ class AST_node extends Syntax_tree_node{
         if (!ID.type.equals(child_ID))
           throw new Semantic_error(this.line_numb, ID.type, TYPE_MISMATCH + child_ID);
       } else {
-        if (ID.type.equals(type_bool_token)) {
-          if (!parse.is_BOOL(this.children[1].name) && !grammar_bool_expr.equals(this.children[1].name)) {
+        if (ID.type.equals(TYPE_BOOL_TOKEN)) {
+          if (!parse.is_BOOL(this.children[1].name) && !GRAMMAR_BOOL_EXPR.equals(this.children[1].name)) {
             throw new Semantic_error(this.line_numb, ID.type, TYPE_MISMATCH + this.children[1].name);
           }
-        } else if (ID.type.equals(type_int_token) && !parse.is_DIGIT(this.children[1].name)){
+        } else if (ID.type.equals(TYPE_INT_TOKEN) && !parse.is_DIGIT(this.children[1].name)){
           throw new Semantic_error(this.line_numb, ID.type, TYPE_MISMATCH + this.children[1].name);
         }
       }
@@ -144,7 +144,7 @@ class AST_node extends Syntax_tree_node{
 
   int print_down_symbol_table(int depth){
     AtomicInteger total_variables = new AtomicInteger();
-    if (this.name.equals(grammar_block)){
+    if (this.name.equals(GRAMMAR_BLOCK)){
       map.forEach((k,v) -> {System.out.println("var: " + k + " of type " + v.type + " in scope " + map.scope);
         total_variables.getAndIncrement();
       });
