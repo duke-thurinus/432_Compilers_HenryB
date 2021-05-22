@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class semantic_analysis extends compiler {
 
@@ -11,12 +12,13 @@ public class semantic_analysis extends compiler {
 class AST_tree extends Syntax_tree {
   AST_node root = null;
   AST_node current = null;
+  int total_variables;
 
   void analyze_tree(String name){
     System.out.println(name);
     try {
       root.analyze_down_tree(0);
-      this.print_symbol_table("Symbol Table");
+      total_variables = this.print_symbol_table("Symbol Table");
       code_generation.generate_code(this);
     } catch (Semantic_error semantic_error) {
       if (semantic_error.error_type.equals(UNDECLARED_ID)) {
@@ -30,9 +32,9 @@ class AST_tree extends Syntax_tree {
     }
   }
 
-  void print_symbol_table(String name){
+  int print_symbol_table(String name){
     System.out.println(name);
-    root.print_down_symbol_table(0);
+    return root.print_down_symbol_table(0);
   }
 
   void add_node(String name, int line_numb){
@@ -140,17 +142,21 @@ class AST_node extends Syntax_tree_node{
     }
   }
 
-  void print_down_symbol_table(int depth){
+  int print_down_symbol_table(int depth){
+    AtomicInteger total_variables = new AtomicInteger();
     if (this.name.equals(grammar_block)){
-      map.forEach((k,v) -> System.out.println("var: " + k + " of type " + v.type + " in scope " + map.scope));
+      map.forEach((k,v) -> {System.out.println("var: " + k + " of type " + v.type + " in scope " + map.scope);
+        total_variables.getAndIncrement();
+      });
     }
     for (AST_node child : children) {
       if (child != null) {
-        child.print_down_symbol_table(depth + 1);
+        total_variables.addAndGet(child.print_down_symbol_table(depth + 1));
       } else {
         break;
       }
     }
+    return total_variables.intValue();
   }
 
   Variable_data find_ID(String ID_name){
