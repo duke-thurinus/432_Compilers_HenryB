@@ -17,11 +17,16 @@ class Program{
   final static int MAX_CODE_SIZE = 256;
   short[] code = new short[MAX_CODE_SIZE];
   int code_pos = 0;
-  int heap_pos = MAX_CODE_SIZE;
+  int heap_pos = MAX_CODE_SIZE - 1;
   Temp_data[] back_patch_data;
 
   Program(AST_tree AST){
     back_patch_data = new Temp_data[AST.total_variables];
+  }
+
+  void add_instruction(short instruction){
+    code[code_pos] = instruction;
+    code_pos++;
   }
 
   void print_code_hex(){
