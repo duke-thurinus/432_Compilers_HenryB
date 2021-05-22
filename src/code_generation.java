@@ -17,6 +17,8 @@ public class code_generation extends compiler{
         }
       }
     }
+    // end of code break
+    program.add_instruction((short) 0x00);
   }
 
   static void var_decl(AST_node node, Program program){
