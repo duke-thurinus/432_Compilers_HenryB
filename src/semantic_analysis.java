@@ -67,6 +67,7 @@ class AST_tree extends Syntax_tree {
 }
 
 class AST_node extends Syntax_tree_node{
+  static int next_scope = 0;
   Symbol_table map = null;
   AST_node parent = null;
   AST_node[] children;
@@ -76,7 +77,7 @@ class AST_node extends Syntax_tree_node{
     super(name);
     this.line_numb = line_numb;
     children = new AST_node[5];
-    if (name.equals(GRAMMAR_BLOCK)) map = new Symbol_table(find_scope() + 1);
+    if (name.equals(GRAMMAR_BLOCK)) map = new Symbol_table(next_scope++);
   }
 
   AST_node(String name, AST_node parent, int line_numb) {
@@ -84,7 +85,7 @@ class AST_node extends Syntax_tree_node{
     this.line_numb = line_numb;
     this.parent = parent;
     children = new AST_node[5];
-    if (name.equals(GRAMMAR_BLOCK)) map = new Symbol_table(find_scope() + 1);
+    if (name.equals(GRAMMAR_BLOCK)) map = new Symbol_table(next_scope++);
     else map = parent.map;
   }
 
