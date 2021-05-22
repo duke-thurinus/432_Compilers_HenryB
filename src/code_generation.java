@@ -8,6 +8,8 @@ public class code_generation extends compiler{
     for (AST_node node : cur_node.children) {
       if (node.name.equals(GRAMMAR_BLOCK)){
         code_generation.generate_code_for_layer(node);
+      } else if (node.name.equals(GRAMMAR_VAR_DECL)){
+        
       }
     }
   }
@@ -27,6 +29,14 @@ class Program{
   void add_instruction(short instruction){
     code[code_pos] = instruction;
     code_pos++;
+  }
+
+  int find_temp_data(String desired_var, int scope){
+    for (Temp_data temp :
+            back_patch_data) {
+      if (temp.var.equals(desired_var) && temp.scope == scope) return temp.name;
+    }
+    return 0;
   }
 
   void print_code_hex(){
