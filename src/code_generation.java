@@ -64,9 +64,16 @@ public class code_generation extends compiler{
       } else {
         // addition then assignment
       }
-    } else if (Arrays.asList(BOOL_VALS).contains(node.children[1].name) ||
-               node.children[1].name.equals(GRAMMAR_BOOL_EXPR)){
+    } else if (Arrays.asList(BOOL_VALS).contains(node.children[1].name)){
       // bool assignment
+      if (node.children[1].name.equals(BOOL_VALS[0])){
+        program.load_accumulator_constant((short) 0x00);
+      } else {
+        program.load_accumulator_constant((short) 0x01);
+      }
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope(), node));
+    } else if (node.children[1].name.equals(GRAMMAR_BOOL_EXPR)) {
+      // bool expression then assignment
     } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
       // variable copy by reference
       // load data from variable
