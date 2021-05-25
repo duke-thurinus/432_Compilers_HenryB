@@ -60,7 +60,7 @@ public class code_generation extends compiler{
       if (node.children[2] == null){
         //single assignment
         program.load_accumulator_constant((short) Arrays.asList(DIGIT_TOKENS).indexOf(node.children[1].name));
-        program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope()));
+        program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope(), node));
       } else {
         // addition then assignment
       }
@@ -70,8 +70,8 @@ public class code_generation extends compiler{
     } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
       // variable copy by reference
       // load data from variable
-      program.load_accumulator_memory(program.find_temp_data(node.children[1].name, node.find_scope()));
-      program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope()));
+      program.load_accumulator_memory(program.find_temp_data(node.children[1].name, node.find_scope(), node));
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope(), node));
     } else if (TYPE_STRING_TOKEN.equals(node.children[1].name)){
       // string assignment
     }
@@ -85,9 +85,11 @@ class Program extends code_generation{
   int heap_pos = MAX_CODE_SIZE - 1;
   Temp_data[] back_patch_data;
   int back_patch_count = 0;
+  AST_tree AST;
 
   Program(AST_tree AST){
     back_patch_data = new Temp_data[AST.total_variables];
+    this.AST = AST;
   }
 
   void add_instruction(short instruction){
@@ -125,12 +127,16 @@ class Program extends code_generation{
   }
 
 
-  Temp_data find_temp_data(String desired_var, int scope){
+  Temp_data find_temp_data(String desired_var, int scope, AST_node node){
     for (Temp_data temp :
             back_patch_data) {
       if (temp.var.equals(desired_var) && temp.scope == scope) return temp;
     }
-    return null;
+    if (node.parent != null) {
+      return find_temp_data(desired_var, node.parent.find_scope(), node.parent);
+    } else {
+      return null;
+    }
   }
 
   void print_code_hex(){
