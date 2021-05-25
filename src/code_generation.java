@@ -60,7 +60,7 @@ public class code_generation extends compiler{
       if (node.children[2] == null){
         //single assignment
         program.load_accumulator_constant((short) Arrays.asList(DIGIT_TOKENS).indexOf(node.children[1].name));
-        program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope(), node));
+        program.store_accumulator(program.find_temp_data(node.children[0].name, node));
       } else {
         // addition then assignment
       }
@@ -71,14 +71,14 @@ public class code_generation extends compiler{
       } else {
         program.load_accumulator_constant((short) 0x01);
       }
-      program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope(), node));
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node));
     } else if (node.children[1].name.equals(GRAMMAR_BOOL_EXPR)) {
       // bool expression then assignment
     } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
       // variable copy by reference
       // load data from variable
-      program.load_accumulator_memory(program.find_temp_data(node.children[1].name, node.find_scope(), node));
-      program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope(), node));
+      program.load_accumulator_memory(program.find_temp_data(node.children[1].name, node));
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node));
     } else if (TYPE_STRING_TOKEN.equals(node.children[1].name)){
       // string assignment
     }
@@ -134,13 +134,14 @@ class Program extends code_generation{
   }
 
 
-  Temp_data find_temp_data(String desired_var, int scope, AST_node node){
+  Temp_data find_temp_data(String desired_var, AST_node node){
+    int scope = node.find_scope();
     for (Temp_data temp :
             back_patch_data) {
       if (temp.var.equals(desired_var) && temp.scope == scope) return temp;
     }
     if (node.parent != null) {
-      return find_temp_data(desired_var, node.parent.find_scope(), node.parent);
+      return find_temp_data(desired_var, node.parent);
     } else {
       return null;
     }
