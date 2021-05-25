@@ -20,19 +20,6 @@ public class code_generation extends compiler{
       }
     }
   }
-  static void generate_code_for_layer(AST_node cur_node, Program program){
-    for (AST_node node : cur_node.children) {
-      if (node != null) {
-        if (node.name.equals(GRAMMAR_BLOCK)){
-          code_generation.generate_code_for_layer(node, program);
-        } else if (node.name.equals(GRAMMAR_VAR_DECL)){
-          var_decl(node, program);
-        } else if (node.name.equals(GRAMMAR_ASSIGNMENT_STATEMENT)){
-          assignment(node, program);
-        }
-      }
-    }
-  }
 
   static void back_patch(Program program){
     int end_of_code = program.code_stack_pos;
@@ -44,6 +31,20 @@ public class code_generation extends compiler{
       if (program.code[i] > 0xFF){
         for (Temp_data data: program.back_patch_data){
           if (program.code[i] == data.name) program.code[i] = data.address;
+        }
+      }
+    }
+  }
+  
+  static void generate_code_for_layer(AST_node cur_node, Program program){
+    for (AST_node node : cur_node.children) {
+      if (node != null) {
+        if (node.name.equals(GRAMMAR_BLOCK)){
+          code_generation.generate_code_for_layer(node, program);
+        } else if (node.name.equals(GRAMMAR_VAR_DECL)){
+          var_decl(node, program);
+        } else if (node.name.equals(GRAMMAR_ASSIGNMENT_STATEMENT)){
+          assignment(node, program);
         }
       }
     }
