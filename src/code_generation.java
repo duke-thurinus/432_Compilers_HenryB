@@ -8,6 +8,8 @@ public class code_generation extends compiler{
   static void generate_code(AST_tree AST, boolean verbose_mode){
     Program program = new Program(AST);
     generate_code_for_layer(AST.root, program);
+    // end of code break
+    program.add_instruction((short) 0x00);
     back_patch(program);
     if (program.code_stack_pos > program.heap_pos + 1){
       System.out.println("Code Generation Error: Program has exceeded the " + Program.MAX_CODE_SIZE + " byte size limit");
@@ -30,8 +32,6 @@ public class code_generation extends compiler{
         }
       }
     }
-    // end of code break
-    program.add_instruction((short) 0x00);
   }
 
   static void back_patch(Program program){
