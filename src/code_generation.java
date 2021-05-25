@@ -50,7 +50,7 @@ public class code_generation extends compiler{
   }
 
   static void var_decl(AST_node node, Program program){
-    program.load_accumulator((short)0x00);
+    program.load_accumulator_constant((short)0x00);
     program.store_accumulator(program.new_temp_data(node.children[1].name, node.find_scope()));
   }
 
@@ -59,7 +59,7 @@ public class code_generation extends compiler{
       // int assignment
       if (node.children[2] == null){
         //single assignment
-        program.load_accumulator((short) Arrays.asList(DIGIT_TOKENS).indexOf(node.children[1].name));
+        program.load_accumulator_constant((short) Arrays.asList(DIGIT_TOKENS).indexOf(node.children[1].name));
         program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope()));
       } else {
         // addition then assignment
@@ -69,6 +69,9 @@ public class code_generation extends compiler{
       // bool assignment
     } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
       // variable copy by reference
+      // load data from variable
+      program.load_accumulator_memory(program.find_temp_data(node.children[1].name, node.find_scope()));
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope()));
     } else if (TYPE_STRING_TOKEN.equals(node.children[1].name)){
       // string assignment
     }
@@ -92,12 +95,12 @@ class Program extends code_generation{
     code_stack_pos++;
   }
 
-  void load_accumulator(short constant){
+  void load_accumulator_constant(short constant){
     add_instruction(LOAD_ACCUMULATOR_CONSTANT);
     add_instruction(constant);
   }
 
-  void load_accumulator(Temp_data data){
+  void load_accumulator_memory(Temp_data data){
     add_instruction(LOAD_ACCUMULATOR_MEMORY);
     add_instruction(data.name);
     add_instruction((short)0x00);
@@ -108,7 +111,7 @@ class Program extends code_generation{
     add_instruction(data.name);
     add_instruction((short) 0x00);
   }
-  
+
   void store_accumulator(short name){
     add_instruction(STORE_ACCUMULATOR);
     add_instruction(name);
@@ -122,12 +125,12 @@ class Program extends code_generation{
   }
 
 
-  short find_temp_data(String desired_var, int scope){
+  Temp_data find_temp_data(String desired_var, int scope){
     for (Temp_data temp :
             back_patch_data) {
-      if (temp.var.equals(desired_var) && temp.scope == scope) return temp.name;
+      if (temp.var.equals(desired_var) && temp.scope == scope) return temp;
     }
-    return 0;
+    return null;
   }
 
   void print_code_hex(){
