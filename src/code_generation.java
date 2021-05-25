@@ -108,6 +108,7 @@ class Program extends code_generation{
     add_instruction(data.name);
     add_instruction((short) 0x00);
   }
+  
   void store_accumulator(short name){
     add_instruction(STORE_ACCUMULATOR);
     add_instruction(name);
