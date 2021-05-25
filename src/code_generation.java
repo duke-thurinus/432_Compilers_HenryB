@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.List;
 
 public class code_generation extends compiler{
   final static short LOAD_ACCUMULATOR_CONSTANT = 0xA9;
@@ -52,7 +53,7 @@ public class code_generation extends compiler{
 
   static void var_decl(AST_node node, Program program){
     program.load_accumulator_constant((short)0x00);
-    program.store_accumulator(program.new_temp_data(node.children[1].name, node.find_scope()));
+    program.store_accumulator(program.new_temp_data(node.children[1].name, node.find_scope()).name);
   }
 
   static void assignment(AST_node node, Program program){
@@ -61,7 +62,7 @@ public class code_generation extends compiler{
       if (node.children[2] == null){
         //single assignment
         program.load_accumulator_constant((short) Arrays.asList(DIGIT_TOKENS).indexOf(node.children[1].name));
-        program.store_accumulator(program.find_temp_data(node.children[0].name, node));
+        program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
       } else {
         // addition then assignment
       }
@@ -72,14 +73,14 @@ public class code_generation extends compiler{
       } else {
         program.load_accumulator_constant((short) 0x01);
       }
-      program.store_accumulator(program.find_temp_data(node.children[0].name, node));
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
     } else if (node.children[1].name.equals(GRAMMAR_BOOL_EXPR)) {
       // bool expression then assignment
     } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
       // variable copy by reference
       // load data from variable
       program.load_accumulator_memory(program.find_temp_data(node.children[1].name, node));
-      program.store_accumulator(program.find_temp_data(node.children[0].name, node));
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
     } else if (TYPE_STRING_TOKEN.equals(node.children[1].name)){
       // string assignment
     }
@@ -92,11 +93,13 @@ class Program extends code_generation{
   int code_stack_pos = 0;
   int heap_pos = MAX_CODE_SIZE - 1;
   Temp_data[] back_patch_data;
+  Heap_data[] heap_data;
   int back_patch_count = 0;
   AST_tree AST;
 
   Program(AST_tree AST){
     back_patch_data = new Temp_data[AST.total_variables];
+    heap_data = new Heap_data[10];
     this.AST = AST;
   }
 
@@ -114,12 +117,6 @@ class Program extends code_generation{
     add_instruction(LOAD_ACCUMULATOR_MEMORY);
     add_instruction(data.name);
     add_instruction((short)0x00);
-  }
-
-  void store_accumulator(Temp_data data){
-    add_instruction(STORE_ACCUMULATOR);
-    add_instruction(data.name);
-    add_instruction((short) 0x00);
   }
 
   void store_accumulator(short name){
@@ -146,6 +143,40 @@ class Program extends code_generation{
     } else {
       return null;
     }
+  }
+
+  Heap_data get_heap_simple_data(String byte_of_data){
+    int first_empty = -1;
+    // check if data is already in heap
+    for (int i = 0; i < heap_data.length; i++) {
+      if (heap_data[i] != null){
+        if (heap_data[i].var.equals(byte_of_data)){
+          return heap_data[i];
+        }
+      } else {
+        first_empty = i;
+        break;
+      }
+    }
+    // double array if full
+    if (first_empty == -1){
+      Heap_data[] new_heap_data = new Heap_data[heap_data.length * 2];
+      System.arraycopy(heap_data, 0, new_heap_data, 0, heap_data.length);
+      first_empty = heap_data.length;
+      heap_data = new_heap_data;
+    }
+    // add data if does not exist
+    List<String> temp = Arrays.asList(DIGIT_TOKENS);
+    if (temp.contains(byte_of_data)) {
+      code[heap_pos] = (short) temp.indexOf(byte_of_data);
+    } else if (BOOL_VALS[0].equals(byte_of_data)){
+      code[heap_pos] = (short) 0x0;
+    } else if (BOOL_VALS[1].equals(byte_of_data)){
+      code[heap_pos] = (short) 0x1;
+    }
+    heap_data[first_empty] = new Heap_data(byte_of_data, (short) heap_pos);
+    heap_pos--;
+    return heap_data[first_empty];
   }
 
   void print_code_hex(){
@@ -183,12 +214,24 @@ class Program extends code_generation{
   }
 }
 
-class Temp_data{
+class Heap_data{
+  String var;
+  short address;
+
+  public Heap_data(String var, short address) {
+    this.var = var;
+    this.address = address;
+  }
+
+  Heap_data() {
+
+  }
+}
+
+class Temp_data extends Heap_data{
   static short next_new_temp = 0x100; // anything past 0xFF is a temp variable as >= 0x100 is invalid output
   short name;
-  String var;
   int scope;
-  short address;
 
   Temp_data(String var, int scope) {
     this.name = next_new_temp;
