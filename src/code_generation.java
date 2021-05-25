@@ -1,5 +1,8 @@
+import java.util.Arrays;
+
 public class code_generation extends compiler{
   final static short LOAD_ACCUMULATOR_CONSTANT = 0xA9;
+  final static short LOAD_ACCUMULATOR_MEMORY = 0xAD;
   final static short STORE_ACCUMULATOR = 0x8D;
 
   static void generate_code(AST_tree AST){
@@ -42,15 +45,12 @@ public class code_generation extends compiler{
   }
 
   static void var_decl(AST_node node, Program program){
-    program.add_instruction(LOAD_ACCUMULATOR_CONSTANT);
-    program.add_instruction((short) 0x00);// initialize variables to zero
-    program.add_instruction(STORE_ACCUMULATOR);
-    program.add_instruction(program.new_temp_data(node.children[1].name, node.find_scope()));
-    program.add_instruction((short) 0x00);
+    program.load_accumulator((short)0x00);
+    program.store_accumulator(program.new_temp_data(node.children[1].name, node.find_scope()));
   }
 }
 
-class Program{
+class Program extends code_generation{
   final static int MAX_CODE_SIZE = 256;
   short[] code = new short[MAX_CODE_SIZE];
   int code_stack_pos = 0;
@@ -67,10 +67,27 @@ class Program{
     code_stack_pos++;
   }
 
-  short new_temp_data(String var, int scope){
+  void load_accumulator(short constant){
+    add_instruction(LOAD_ACCUMULATOR_CONSTANT);
+    add_instruction(constant);
+  }
+
+  void load_accumulator(Temp_data data){
+    add_instruction(LOAD_ACCUMULATOR_MEMORY);
+    add_instruction(data.name);
+    add_instruction((short)0x00);
+  }
+
+  void store_accumulator(Temp_data data){
+    add_instruction(STORE_ACCUMULATOR);
+    add_instruction(data.name);
+    add_instruction((short) 0x00);
+  }
+
+  Temp_data new_temp_data(String var, int scope){
     back_patch_data[back_patch_count] = new Temp_data(var, scope);
     back_patch_count++;
-    return back_patch_data[back_patch_count - 1].name;
+    return back_patch_data[back_patch_count - 1];
   }
 
 
