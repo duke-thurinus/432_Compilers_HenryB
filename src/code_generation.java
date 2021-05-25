@@ -27,7 +27,7 @@ public class code_generation extends compiler{
       data.address = (short) program.code_stack_pos;
       program.code_stack_pos++;
     }
-    for (int i = 0; i < program.code_stack_pos; i++) {
+    for (int i = 0; i < end_of_code; i++) {
       if (program.code[i] > 0xFF){
         for (Temp_data data: program.back_patch_data){
           if (program.code[i] == data.name) program.code[i] = data.address;
@@ -35,7 +35,7 @@ public class code_generation extends compiler{
       }
     }
   }
-  
+
   static void generate_code_for_layer(AST_node cur_node, Program program){
     for (AST_node node : cur_node.children) {
       if (node != null) {
