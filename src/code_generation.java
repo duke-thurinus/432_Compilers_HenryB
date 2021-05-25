@@ -22,6 +22,8 @@ public class code_generation extends compiler{
           code_generation.generate_code_for_layer(node, program);
         } else if (node.name.equals(GRAMMAR_VAR_DECL)){
           var_decl(node, program);
+        } else if (node.name.equals(GRAMMAR_ASSIGNMENT_STATEMENT)){
+          assignment(node, program);
         }
       }
     }
@@ -47,6 +49,26 @@ public class code_generation extends compiler{
   static void var_decl(AST_node node, Program program){
     program.load_accumulator((short)0x00);
     program.store_accumulator(program.new_temp_data(node.children[1].name, node.find_scope()));
+  }
+
+  static void assignment(AST_node node, Program program){
+    if (Arrays.asList(DIGIT_TOKENS).contains(node.children[1].name)){
+      // int assignment
+      if (node.children[2] == null){
+        //single assignment
+        program.load_accumulator((short) Arrays.asList(DIGIT_TOKENS).indexOf(node.children[1].name));
+        program.store_accumulator(program.find_temp_data(node.children[0].name, node.find_scope()));
+      } else {
+        // addition then assignment
+      }
+    } else if (Arrays.asList(BOOL_VALS).contains(node.children[1].name) ||
+               node.children[1].name.equals(GRAMMAR_BOOL_EXPR)){
+      // bool assignment
+    } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
+      // variable copy by reference
+    } else if (TYPE_STRING_TOKEN.equals(node.children[1].name)){
+      // string assignment
+    }
   }
 }
 
@@ -83,6 +105,11 @@ class Program extends code_generation{
     add_instruction(data.name);
     add_instruction((short) 0x00);
   }
+  void store_accumulator(short name){
+    add_instruction(STORE_ACCUMULATOR);
+    add_instruction(name);
+    add_instruction((short) 0x00);
+  }
 
   Temp_data new_temp_data(String var, int scope){
     back_patch_data[back_patch_count] = new Temp_data(var, scope);
@@ -91,7 +118,7 @@ class Program extends code_generation{
   }
 
 
-  int find_temp_data(String desired_var, int scope){
+  short find_temp_data(String desired_var, int scope){
     for (Temp_data temp :
             back_patch_data) {
       if (temp.var.equals(desired_var) && temp.scope == scope) return temp.name;
