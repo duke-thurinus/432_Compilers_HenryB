@@ -5,7 +5,7 @@ public class code_generation extends compiler{
   final static short LOAD_ACCUMULATOR_MEMORY = 0xAD;
   final static short STORE_ACCUMULATOR = 0x8D;
 
-  static void generate_code(AST_tree AST){
+  static void generate_code(AST_tree AST, boolean verbose_mode){
     Program program = new Program(AST);
     generate_code_for_layer(AST.root, program);
     back_patch(program);
@@ -13,6 +13,9 @@ public class code_generation extends compiler{
       System.out.println("Code Generation Error: Program has exceeded the " + Program.MAX_CODE_SIZE + " byte size limit");
     } else {
       program.print_code_hex();
+      if (verbose_mode){
+        program.print_code_hex_human_readable();
+      }
     }
   }
   static void generate_code_for_layer(AST_node cur_node, Program program){
@@ -128,6 +131,22 @@ class Program extends code_generation{
 
   void print_code_hex(){
     System.out.println();
+    System.out.println("HEX CODE:");
+    int counter = 0;
+    for (short byt: code) {
+      if (counter >= 8){
+        System.out.println();
+        counter = 0;
+      }
+      System.out.print(String.format("%02x", byt) + " ");
+      counter++;
+    }
+    System.out.println();
+  }
+
+  void print_code_hex_human_readable(){
+    System.out.println();
+    System.out.println("Human Readable Hex:");
     int counter = 0;
     int line_num = 0;
     System.out.print(String.format("%02x", line_num) + " : ");
@@ -141,6 +160,7 @@ class Program extends code_generation{
       System.out.print(String.format("%02x", byt) + " ");
       counter++;
     }
+    System.out.println();
   }
 }
 
