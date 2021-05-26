@@ -9,7 +9,7 @@ public class code_generation extends compiler{
   final static short LOAD_X_CONSTANT = 0xA2;
   final static short LOAD_X_MEMORY = 0xAE;
   final static short COMPARE = 0xEC;
-  final static short BRANCH = 0xAD;
+  final static short BRANCH = 0xD0;
 
   static void generate_code(AST_tree AST, boolean verbose_mode){
     Program program = new Program(AST);
@@ -90,6 +90,7 @@ public class code_generation extends compiler{
       program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
     } else if (node.children[1].name.equals(GRAMMAR_BOOL_EXPR)) {
       // bool expression then assignment
+      bool_expression(program, node.children[1]);
     } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
       // variable copy by reference
       // load data from variable
@@ -99,6 +100,37 @@ public class code_generation extends compiler{
       // string assignment
       program.load_accumulator_constant(program.get_heap_string(node.children[1].children[0].name).address);
       program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
+    }
+  }
+
+  static void bool_expression(Program program, AST_node node){
+    // expression must always be 3 long
+    if (Arrays.asList(ID_TOKENS).contains(node.children[0].name)){
+      program.load_x_memory(program.find_temp_data(node.children[0].name, node).name);
+    } else if (node.children[0].name.equals(TYPE_STRING_TOKEN)){
+      program.load_x_memory(program.get_heap_string(node.children[0].children[0].name).address);
+    } else {
+      if (node.children[0].name.equals(BOOL_VALS[0])){
+        program.load_x_constant((short) 0x00);
+      } else if (node.children[0].name.equals(BOOL_VALS[1])) {
+        program.load_x_constant((short) 0x01);
+      } else {
+        program.load_x_constant((short) Arrays.asList(DIGIT_TOKENS).indexOf(node.children[0].name));
+      }
+    }
+
+    if (Arrays.asList(ID_TOKENS).contains(node.children[2].name)){
+      program.compare(program.find_temp_data(node.children[2].name, node).name);
+    } else if (node.children[2].name.equals(TYPE_STRING_TOKEN)){
+      program.compare(program.get_heap_string(node.children[2].children[0].name).address);
+    } else {
+      if (node.children[2].name.equals(BOOL_VALS[0])){
+        program.compare(program.get_heap_simple_data(BOOL_VALS[0]).address);
+      } else if (node.children[2].name.equals(BOOL_VALS[1])) {
+        program.compare(program.get_heap_simple_data(BOOL_VALS[1]).address);
+      } else {
+        program.compare(program.get_heap_simple_data(node.children[2].name).address);
+      }
     }
   }
 
@@ -141,6 +173,12 @@ class Program extends code_generation{
   void load_accumulator_memory(Temp_data data){
     add_instruction(LOAD_ACCUMULATOR_MEMORY);
     add_instruction(data.name);
+    add_instruction((short)0x00);
+  }
+
+  void load_accumulator_memory(short address){
+    add_instruction(LOAD_ACCUMULATOR_MEMORY);
+    add_instruction(address);
     add_instruction((short)0x00);
   }
 
