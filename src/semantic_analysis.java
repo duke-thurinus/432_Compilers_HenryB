@@ -149,6 +149,11 @@ class AST_node extends Syntax_tree_node{
       map.forEach((k,v) -> {System.out.println("var: " + k + " of type " + v.type + " in scope " + map.scope);
         total_variables.getAndIncrement();
       });
+      for (AST_node node :
+              this.children) {
+        if (node != null && node.name.equals(GRAMMAR_IF_STATEMENT)) total_variables.incrementAndGet();
+        else if (node != null && node.name.equals(GRAMMAR_ASSIGNMENT_STATEMENT) && node.children[1].name.equals(GRAMMAR_BOOL_EXPR)) total_variables.incrementAndGet();
+      }
     }
     for (AST_node child : children) {
       if (child != null) {

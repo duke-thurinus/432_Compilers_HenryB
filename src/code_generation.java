@@ -30,8 +30,10 @@ public class code_generation extends compiler{
   static void back_patch(Program program){
     int end_of_code = program.code_stack_pos;
     for (Temp_data data : program.back_patch_data) {
-      data.address = (short) program.code_stack_pos;
-      program.code_stack_pos++;
+      if (!data.jump) {
+        data.address = (short) program.code_stack_pos;
+        program.code_stack_pos++;
+      }
     }
     for (int i = 0; i < end_of_code; i++) {
       if (program.code[i] > 0xFF){
@@ -91,6 +93,19 @@ public class code_generation extends compiler{
     } else if (node.children[1].name.equals(GRAMMAR_BOOL_EXPR)) {
       // bool expression then assignment
       bool_expression(program, node.children[1]);
+      if (node.children[1].children[1].name.equals(EQUALITY_TOKEN)){
+        program.load_accumulator_constant((short) 0x00);
+      } else {
+        program.load_accumulator_constant((short) 0x01);
+      }
+      Temp_data jump = program.branch();
+      if (node.children[1].children[1].name.equals(EQUALITY_TOKEN)){
+        program.load_accumulator_constant((short) 0x01);
+      } else {
+        program.load_accumulator_constant((short) 0x00);
+      }
+      jump.address = 0x02;
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
     } else if (Arrays.asList(ID_TOKENS).contains(node.children[1].name)){
       // variable copy by reference
       // load data from variable
@@ -217,8 +232,22 @@ class Program extends code_generation{
     add_instruction((short) 0x00);
   }
 
+  Temp_data branch(){
+    // jumps a number of bytes if z is = 0
+    add_instruction(BRANCH);
+    Temp_data jump = new_jump();
+    add_instruction(jump.name);
+    return jump;
+  }
+
   Temp_data new_temp_data(String var, int scope){
     back_patch_data[back_patch_count] = new Temp_data(var, scope);
+    back_patch_count++;
+    return back_patch_data[back_patch_count - 1];
+  }
+
+  Temp_data new_jump(){
+    back_patch_data[back_patch_count] = new Temp_data(true);
     back_patch_count++;
     return back_patch_data[back_patch_count - 1];
   }
@@ -359,11 +388,19 @@ class Temp_data extends Heap_data{
   static short next_new_temp = 0x100; // anything past 0xFF is a temp variable as >= 0x100 is invalid output
   short name;
   int scope;
+  boolean jump;
 
   Temp_data(String var, int scope) {
     this.name = next_new_temp;
     next_new_temp++;
     this.var = var;
     this.scope = scope;
+  }
+
+  Temp_data(boolean jump) {
+    // for jumps this.address will be the numb of bytes to jump
+    this.name = next_new_temp;
+    next_new_temp++;
+    this.jump = jump;
   }
 }
