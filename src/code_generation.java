@@ -47,20 +47,26 @@ public class code_generation extends compiler{
     }
   }
 
-  static void generate_code_for_layer(AST_node cur_node, Program program){
+  static int generate_code_for_layer(AST_node cur_node, Program program){
+    int start_pos = program.code_stack_pos;
     for (AST_node node : cur_node.children) {
       if (node != null) {
         if (node.name.equals(GRAMMAR_BLOCK)){
-          code_generation.generate_code_for_layer(node, program);
+          if (!node.parent.name.equals(GRAMMAR_IF_STATEMENT)) {
+            code_generation.generate_code_for_layer(node, program);
+          }
         } else if (node.name.equals(GRAMMAR_VAR_DECL)){
           var_decl(node, program);
         } else if (node.name.equals(GRAMMAR_ASSIGNMENT_STATEMENT)){
           assignment(node, program);
         } else  if (node.name.equals(GRAMMAR_PRINT_STATEMENT)){
           print(node, program);
+        } else  if (node.name.equals(GRAMMAR_IF_STATEMENT)){
+          if_statement(node, program);
         }
       }
     }
+    return program.code_stack_pos - start_pos;
   }
 
   static void var_decl(AST_node node, Program program){
@@ -173,6 +179,23 @@ public class code_generation extends compiler{
     } else {
       System.out.println("Printing expressions not supported, save to variable and then print the variable");
     }
+  }
+
+  static void if_statement(AST_node node, Program program){
+    if (node.children[0].name.equals(GRAMMAR_BOOL_EXPR)){
+      // bool expression
+    } else {
+      // single bool value
+      if (node.children[0].name.equals(BOOL_VALS[0])){
+        program.load_x_constant((short) 0x00);
+      } else {
+        program.load_x_constant((short) 0x01);
+      }
+      program.compare(program.get_heap_simple_data(BOOL_VALS[1]).address);
+    }
+    Temp_data jump = program.branch();
+    jump.address = (short) generate_code_for_layer(node.children[1], program);
+    System.out.println();
   }
 }
 
@@ -297,7 +320,7 @@ class Program extends code_generation{
     int scope = node.find_scope();
     for (Temp_data temp :
             back_patch_data) {
-      if (temp.var.equals(desired_var) && temp.scope == scope) return temp;
+      if (temp.var != null && temp.var.equals(desired_var) && temp.scope == scope) return temp;
     }
     if (node.parent != null) {
       return find_temp_data(desired_var, node.parent);
