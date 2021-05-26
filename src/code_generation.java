@@ -184,6 +184,7 @@ public class code_generation extends compiler{
   static void if_statement(AST_node node, Program program){
     if (node.children[0].name.equals(GRAMMAR_BOOL_EXPR)){
       // bool expression
+      bool_expression(program, node.children[0]);
     } else {
       // single bool value
       if (node.children[0].name.equals(BOOL_VALS[0])){
@@ -320,7 +321,7 @@ class Program extends code_generation{
     int scope = node.find_scope();
     for (Temp_data temp :
             back_patch_data) {
-      if (temp.var != null && temp.var.equals(desired_var) && temp.scope == scope) return temp;
+      if (temp != null && temp.var != null && temp.var.equals(desired_var) && temp.scope == scope) return temp;
     }
     if (node.parent != null) {
       return find_temp_data(desired_var, node.parent);
