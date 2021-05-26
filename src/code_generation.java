@@ -83,6 +83,8 @@ public class code_generation extends compiler{
       program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
     } else if (TYPE_STRING_TOKEN.equals(node.children[1].name)){
       // string assignment
+      program.load_accumulator_constant(program.get_heap_string(node.children[1].children[0].name).address);
+      program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
     }
   }
 }
