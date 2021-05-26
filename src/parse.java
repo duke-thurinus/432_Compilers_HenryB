@@ -103,6 +103,7 @@ public class parse extends compiler{
     match(OPEN_PARENTHESISE_TOKEN);
     parse_expr();
     match(CLOSED_PARENTHESISE_TOKEN);
+    AST.move_up_to_parent();
     current_tree.move_up_to_parent();
   }
 
