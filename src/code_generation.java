@@ -6,6 +6,10 @@ public class code_generation extends compiler{
   final static short LOAD_ACCUMULATOR_MEMORY = 0xAD;
   final static short STORE_ACCUMULATOR = 0x8D;
   final static short ADD_WITH_CARRY = 0x6D;
+  final static short LOAD_X_CONSTANT = 0xA2;
+  final static short LOAD_X_MEMORY = 0xAE;
+  final static short COMPARE = 0xEC;
+  final static short BRANCH = 0xAD;
 
   static void generate_code(AST_tree AST, boolean verbose_mode){
     Program program = new Program(AST);
@@ -153,6 +157,25 @@ class Program extends code_generation{
     } else {
       add_instruction(find_temp_data(int_token, node).name);
     }
+    add_instruction((short) 0x00);
+  }
+
+  void load_x_constant(short constant){
+    add_instruction(LOAD_X_CONSTANT);
+    add_instruction(constant);
+  }
+
+  void load_x_memory(short address){
+    add_instruction(LOAD_X_MEMORY);
+    add_instruction(address);
+    add_instruction((short) 0x00);
+  }
+
+  void compare(short address){
+    // compares address to x register
+    // sets z = 1 if equal
+    add_instruction(COMPARE);
+    add_instruction(address);
     add_instruction((short) 0x00);
   }
 
