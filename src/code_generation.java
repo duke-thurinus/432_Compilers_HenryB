@@ -5,6 +5,7 @@ public class code_generation extends compiler{
   final static short LOAD_ACCUMULATOR_CONSTANT = 0xA9;
   final static short LOAD_ACCUMULATOR_MEMORY = 0xAD;
   final static short STORE_ACCUMULATOR = 0x8D;
+  final static short ADD_WITH_CARRY = 0x6D;
 
   static void generate_code(AST_tree AST, boolean verbose_mode){
     Program program = new Program(AST);
@@ -65,6 +66,15 @@ public class code_generation extends compiler{
         program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
       } else {
         // addition then assignment
+        String[] int_expr = new String[node.children.length / 2];
+        int temp = 0;
+        for (int i = 1; i < node.children.length; i++) {
+          if (node.children[i] != null && !node.children[i].name.equals(ADDITION_OP_TOKEN)){
+            int_expr[temp] = node.children[i].name;
+            temp++;
+          }
+        }
+        int_expression(int_expr, program, node);
       }
     } else if (Arrays.asList(BOOL_VALS).contains(node.children[1].name)){
       // bool assignment
@@ -85,6 +95,15 @@ public class code_generation extends compiler{
       // string assignment
       program.load_accumulator_constant(program.get_heap_string(node.children[1].children[0].name).address);
       program.store_accumulator(program.find_temp_data(node.children[0].name, node).name);
+    }
+  }
+
+  static void int_expression(String[] expression, Program program, AST_node node) {
+    List<String> digit_tokens = Arrays.asList(DIGIT_TOKENS);
+    program.load_accumulator_constant((short) digit_tokens.indexOf(expression[0]));
+
+    for (int i = 1; i < expression.length; i++) {
+      if (expression[i] != null) program.add_to_accumulator(expression[i], node);
     }
   }
 }
@@ -124,6 +143,16 @@ class Program extends code_generation{
   void store_accumulator(short name){
     add_instruction(STORE_ACCUMULATOR);
     add_instruction(name);
+    add_instruction((short) 0x00);
+  }
+
+  void add_to_accumulator(String int_token , AST_node node){
+    add_instruction(ADD_WITH_CARRY);
+    if (Arrays.asList(DIGIT_TOKENS).contains(int_token)) {
+      add_instruction(get_heap_simple_data(int_token).address);
+    } else {
+      add_instruction(find_temp_data(int_token, node).name);
+    }
     add_instruction((short) 0x00);
   }
 
