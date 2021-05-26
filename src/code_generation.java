@@ -8,8 +8,11 @@ public class code_generation extends compiler{
   final static short ADD_WITH_CARRY = 0x6D;
   final static short LOAD_X_CONSTANT = 0xA2;
   final static short LOAD_X_MEMORY = 0xAE;
+  final static short LOAD_Y_CONSTANT = 0xA0;
+  final static short LOAD_Y_MEMORY = 0xAC;
   final static short COMPARE = 0xEC;
   final static short BRANCH = 0xD0;
+  final static short PRINT = 0xFF;
 
   static void generate_code(AST_tree AST, boolean verbose_mode){
     Program program = new Program(AST);
@@ -53,6 +56,8 @@ public class code_generation extends compiler{
           var_decl(node, program);
         } else if (node.name.equals(GRAMMAR_ASSIGNMENT_STATEMENT)){
           assignment(node, program);
+        } else  if (node.name.equals(GRAMMAR_PRINT_STATEMENT)){
+          print(node, program);
         }
       }
     }
@@ -157,6 +162,18 @@ public class code_generation extends compiler{
       if (expression[i] != null) program.add_to_accumulator(expression[i], node);
     }
   }
+
+  static void print(AST_node node, Program program) {
+    if (Arrays.asList(ID_TOKENS).contains(node.children[0].name)){
+      if (node.find_ID(node.children[0].name).type.equals(TYPE_STRING_TOKEN)){
+        program.print_string(program.find_temp_data(node.children[0].name , node).name);
+      } else {
+        program.print_int(program.find_temp_data(node.children[0].name, node).name);
+      }
+    } else {
+      System.out.println("Printing expressions not supported, save to variable and then print the variable");
+    }
+  }
 }
 
 class Program extends code_generation{
@@ -224,12 +241,35 @@ class Program extends code_generation{
     add_instruction((short) 0x00);
   }
 
+  void load_y_constant(short constant){
+    add_instruction(LOAD_Y_CONSTANT);
+    add_instruction(constant);
+  }
+
+  void load_y_memory(short address){
+    add_instruction(LOAD_Y_MEMORY);
+    add_instruction(address);
+    add_instruction((short) 0x00);
+  }
+
   void compare(short address){
     // compares address to x register
     // sets z = 1 if equal
     add_instruction(COMPARE);
     add_instruction(address);
     add_instruction((short) 0x00);
+  }
+
+  void print_int(short address){
+    load_x_constant((short) 0x01);
+    load_y_memory(address);
+    add_instruction(PRINT);
+  }
+
+  void print_string(short address){
+    load_x_constant((short) 0x02);
+    load_y_memory(address);
+    add_instruction(PRINT);
   }
 
   Temp_data branch(){
