@@ -150,7 +150,8 @@ class Program extends code_generation{
     // check if data is already in heap
     for (int i = 0; i < heap_data.length; i++) {
       if (heap_data[i] != null){
-        if (heap_data[i].var.equals(byte_of_data)){
+        if (heap_data[i].var.equals(byte_of_data) &&
+                !heap_data[i].is_string){
           return heap_data[i];
         }
       } else {
@@ -174,8 +175,40 @@ class Program extends code_generation{
     } else if (BOOL_VALS[1].equals(byte_of_data)){
       code[heap_pos] = (short) 0x1;
     }
-    heap_data[first_empty] = new Heap_data(byte_of_data, (short) heap_pos);
+    heap_data[first_empty] = new Heap_data(byte_of_data, (short) heap_pos, false);
     heap_pos--;
+    return heap_data[first_empty];
+  }
+
+  Heap_data get_heap_string(String string){
+    int first_empty = -1;
+    // check if data is already in heap
+    for (int i = 0; i < heap_data.length; i++) {
+      if (heap_data[i] != null){
+        if (heap_data[i].var.equals(string) &&
+                heap_data[i].is_string){
+          return heap_data[i];
+        }
+      } else {
+        first_empty = i;
+        break;
+      }
+    }
+    // double array if full
+    if (first_empty == -1){
+      Heap_data[] new_heap_data = new Heap_data[heap_data.length * 2];
+      System.arraycopy(heap_data, 0, new_heap_data, 0, heap_data.length);
+      first_empty = heap_data.length;
+      heap_data = new_heap_data;
+    }
+    // add data if does not exist
+    code[heap_pos] = 0x00;
+    heap_pos--;
+    for (int i = string.length() - 1; i >= 0 ; i--) {
+      code[heap_pos] = (short) string.charAt(i);
+      heap_pos--;
+    }
+    heap_data[first_empty] = new Heap_data(string, (short) (heap_pos + 1), true);
     return heap_data[first_empty];
   }
 
@@ -217,10 +250,12 @@ class Program extends code_generation{
 class Heap_data{
   String var;
   short address;
+  boolean is_string;
 
-  public Heap_data(String var, short address) {
+  public Heap_data(String var, short address, boolean is_string) {
     this.var = var;
     this.address = address;
+    this.is_string = is_string;
   }
 
   Heap_data() {
