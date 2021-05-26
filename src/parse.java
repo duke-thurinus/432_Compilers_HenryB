@@ -187,6 +187,7 @@ public class parse extends compiler{
     match(QUOTE_MARK_TOKEN);
     parse_char_list();
     match(QUOTE_MARK_TOKEN);
+    AST.move_up_to_parent();
     current_tree.move_up_to_parent();
   }
 
